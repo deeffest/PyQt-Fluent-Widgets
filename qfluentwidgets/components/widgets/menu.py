@@ -217,8 +217,13 @@ class MenuActionListWidget(QListWidget):
 
     def adjustSize(self, pos=None, aniType=MenuAnimationType.NONE):
         size = QSize()
+
         for i in range(self.count()):
-            s = self.item(i).sizeHint()
+            item = self.item(i)
+            if item.isHidden():
+                continue
+
+            s = item.sizeHint()
             size.setWidth(max(s.width(), size.width(), 1))
             size.setHeight(max(1, size.height() + s.height()))
 
@@ -230,13 +235,18 @@ class MenuActionListWidget(QListWidget):
 
         # adjust the height of list widget
         m = self.viewportMargins()
-        size += QSize(m.left()+m.right()+2, m.top()+m.bottom())
-        size.setHeight(min(h, size.height()+3))
+        size += QSize(m.left() + m.right() + 2, m.top() + m.bottom())
+        size.setHeight(min(h, size.height() + 3))
         size.setWidth(max(min(w, size.width()), self.minimumWidth()))
 
         if self.maxVisibleItems() > 0:
+            visible_count = sum(
+                not self.item(i).isHidden() for i in range(self.count())
+            )
             size.setHeight(min(
-                size.height(), self.maxVisibleItems() * self._itemHeight + m.top()+m.bottom() + 3))
+                size.height(),
+                visible_count * self._itemHeight + m.top() + m.bottom() + 3
+            ))
 
         self.setFixedSize(size)
 
@@ -574,6 +584,23 @@ class RoundMenu(QMenu):
         item = action.property("item")
         if item:
             self.view.setCurrentItem(item)
+
+    def setActionVisible(self, action: QAction, visible: bool):
+        item = action.property("item")
+        if not item:
+            return
+
+        row = self.view.row(item)
+        item.setHidden(not visible)
+
+        for r in (row - 1, row + 1):
+            if 0 <= r < self.view.count():
+                sep = self.view.item(r)
+                if sep.data(Qt.DecorationRole) == "seperator":
+                    sep.setHidden(not visible)
+
+        self.view.adjustSize()
+        self.adjustSize()
 
     def addMenu(self, menu):
         """ add sub menu
