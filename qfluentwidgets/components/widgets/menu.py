@@ -250,6 +250,28 @@ class MenuActionListWidget(QListWidget):
 
         self.setFixedSize(size)
 
+    def _updateVisibility(self, action=None, visible=True):
+        if action:
+            item = action.property("item")
+            if item:
+                item.setHidden(not visible)
+
+        count = self.count()
+        for i in range(count):
+            itm = self.item(i)
+            if itm.data(Qt.DecorationRole) == "seperator":
+                prev_visible = any(
+                    not self.item(j).isHidden() and
+                    self.item(j).data(Qt.DecorationRole) != "seperator"
+                    for j in range(i - 1, -1, -1)
+                )
+                next_visible = any(
+                    not self.item(j).isHidden() and
+                    self.item(j).data(Qt.DecorationRole) != "seperator"
+                    for j in range(i + 1, count)
+                )
+                itm.setHidden(not (prev_visible and next_visible))
+
     def setItemHeight(self, height: int):
         """ set the height of item """
         if height == self._itemHeight:
@@ -585,20 +607,15 @@ class RoundMenu(QMenu):
         if item:
             self.view.setCurrentItem(item)
 
-    def setActionVisible(self, action: QAction, visible: bool):
+    def setActionVisible(self, action, visible):
         item = action.property("item")
         if not item:
             return
-
-        row = self.view.row(item)
         item.setHidden(not visible)
+        self._normalizeMenu()
 
-        for r in (row - 1, row + 1):
-            if 0 <= r < self.view.count():
-                sep = self.view.item(r)
-                if sep.data(Qt.DecorationRole) == "seperator":
-                    sep.setHidden(not visible)
-
+    def _normalizeMenu(self):
+        self.view._updateVisibility()
         self.view.adjustSize()
         self.adjustSize()
 
@@ -819,6 +836,8 @@ class RoundMenu(QMenu):
         """
         #if self.isVisible():
         #    aniType = MenuAnimationType.NONE
+
+        self._normalizeMenu()
 
         self.aniManager = MenuAnimationManager.make(self, aniType)
         self.aniManager.exec(pos)
