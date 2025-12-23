@@ -17,12 +17,13 @@ from qframelesswindow import TitleBar
 class SplashScreen(QWidget):
     """ Splash screen """
 
-    def __init__(self, icon: Union[str, QIcon, FluentIconBase], parent=None, enableShadow=True):
+    def __init__(self, icon: Union[str, QIcon, FluentIconBase], parent=None, enableShadow=True, enableTitleBar=True):
         super().__init__(parent=parent)
         self._icon = icon
         self._iconSize = QSize(96, 96)
 
-        self.titleBar = TitleBar(self)
+        self.titleBar = TitleBar(self) if enableTitleBar else None
+
         self.iconWidget = IconWidget(icon, self)
         self.shadowEffect = QGraphicsDropShadowEffect(self)
 
@@ -31,7 +32,8 @@ class SplashScreen(QWidget):
         self.shadowEffect.setBlurRadius(15)
         self.shadowEffect.setOffset(0, 4)
 
-        FluentStyleSheet.FLUENT_WINDOW.apply(self.titleBar)
+        if self.titleBar:
+            FluentStyleSheet.FLUENT_WINDOW.apply(self.titleBar)
 
         if enableShadow:
             self.iconWidget.setGraphicsEffect(self.shadowEffect)
@@ -39,7 +41,7 @@ class SplashScreen(QWidget):
         if parent:
             parent.installEventFilter(self)
 
-        if sys.platform == "darwin":
+        if self.titleBar and sys.platform == "darwin":
             self.titleBar.hide()
 
     def setIcon(self, icon: Union[str, QIcon, FluentIconBase]):
@@ -59,7 +61,8 @@ class SplashScreen(QWidget):
 
     def setTitleBar(self, titleBar: QWidget):
         """ set title bar """
-        self.titleBar.deleteLater()
+        if self.titleBar:
+            self.titleBar.deleteLater()
         self.titleBar = titleBar
         titleBar.setParent(self)
         titleBar.raise_()
@@ -77,7 +80,8 @@ class SplashScreen(QWidget):
     def resizeEvent(self, e):
         iw, ih = self.iconSize().width(), self.iconSize().height()
         self.iconWidget.move(self.width()//2 - iw//2, self.height()//2 - ih//2)
-        self.titleBar.resize(self.width(), self.titleBar.height())
+        if self.titleBar:
+            self.titleBar.resize(self.width(), self.titleBar.height())
 
     def finish(self):
         """ close splash screen """
