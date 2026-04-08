@@ -211,8 +211,13 @@ class MenuActionListWidget(QListWidget):
 
     def adjustSize(self, pos=None, aniType=MenuAnimationType.NONE):
         size = QSize()
+
         for i in range(self.count()):
-            s = self.item(i).sizeHint()
+            item = self.item(i)
+            if item.isHidden():
+                continue
+
+            s = item.sizeHint()
             size.setWidth(max(s.width(), size.width(), 1))
             size.setHeight(max(1, size.height() + s.height()))
 
@@ -224,15 +229,41 @@ class MenuActionListWidget(QListWidget):
 
         # adjust the height of list widget
         m = self.viewportMargins()
-        size += QSize(m.left()+m.right()+2, m.top()+m.bottom())
-        size.setHeight(min(h, size.height()+3))
+        size += QSize(m.left() + m.right() + 2, m.top() + m.bottom())
+        size.setHeight(min(h, size.height() + 3))
         size.setWidth(max(min(w, size.width()), self.minimumWidth()))
 
         if self.maxVisibleItems() > 0:
-            size.setHeight(min(
-                size.height(), self.maxVisibleItems() * self._itemHeight + m.top()+m.bottom() + 3))
+            visible_count = sum(
+                not self.item(i).isHidden() for i in range(self.count())
+            )
+            size.setHeight(min(size.height(),
+                visible_count * self._itemHeight + m.top() + m.bottom() + 3
+            ))
 
         self.setFixedSize(size)
+
+    def _updateVisibility(self, action=None, visible=True):
+        if action:
+            item = action.property("item")
+            if item:
+                item.setHidden(not visible)
+
+        count = self.count()
+        for i in range(count):
+            itm = self.item(i)
+            if itm.data(Qt.ItemDataRole.DecorationRole) == "seperator":
+                prev_visible = any(
+                    not self.item(j).isHidden() and
+                    self.item(j).data(Qt.ItemDataRole.DecorationRole) != "seperator"
+                    for j in range(i - 1, -1, -1)
+                )
+                next_visible = any(
+                    not self.item(j).isHidden() and
+                    self.item(j).data(Qt.ItemDataRole.DecorationRole) != "seperator"
+                    for j in range(i + 1, count)
+                )
+                itm.setHidden(not (prev_visible and next_visible))
 
     def setItemHeight(self, height: int):
         """ set the height of item """
@@ -556,6 +587,19 @@ class RoundMenu(QMenu):
         if item:
             self.view.setCurrentItem(item)
 
+    def setActionVisible(self, action, visible):
+        item = action.property("item")
+        if not item:
+            return
+
+        item.setHidden(not visible)
+        self._normalizeMenu()
+
+    def _normalizeMenu(self):
+        self.view._updateVisibility()
+        self.view.adjustSize()
+        self.adjustSize()
+
     def addMenu(self, menu):
         """ add sub menu
 
@@ -772,6 +816,8 @@ class RoundMenu(QMenu):
         """
         #if self.isVisible():
         #    aniType = MenuAnimationType.NONE
+
+        self._normalizeMenu()
 
         self.aniManager = MenuAnimationManager.make(self, aniType)
         self.aniManager.exec(pos)

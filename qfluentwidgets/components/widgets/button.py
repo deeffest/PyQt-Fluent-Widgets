@@ -672,6 +672,15 @@ class TransparentDropDownToolButton(DropDownToolButton):
     """
 
 
+class TransparentToolButtonWithMenu(DropDownButtonBase, TransparentToolButton):
+    def mouseReleaseEvent(self, e):
+        TransparentToolButton.mouseReleaseEvent(self, e)
+        self._showMenu()
+
+    def paintEvent(self, e):
+        TransparentToolButton.paintEvent(self, e)
+
+
 class PrimaryDropDownButtonBase(DropDownButtonBase):
     """ Primary color drop down button base class """
 

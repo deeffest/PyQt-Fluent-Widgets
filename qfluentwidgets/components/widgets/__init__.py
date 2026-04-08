@@ -4,7 +4,7 @@ from .button import (DropDownPushButton, DropDownToolButton, PrimaryPushButton, 
                      PrimarySplitToolButton, PrimaryDropDownPushButton, PrimaryDropDownToolButton,
                      TogglePushButton, ToggleToolButton, TransparentPushButton, TransparentTogglePushButton,
                      TransparentToggleToolButton, TransparentDropDownPushButton, TransparentDropDownToolButton,
-                     PillPushButton, PillToolButton)
+                     TransparentToolButtonWithMenu, PillPushButton, PillToolButton)
 from .card_widget import CardWidget, ElevatedCardWidget, SimpleCardWidget, HeaderCardWidget, CardGroupWidget, GroupHeaderCardWidget
 from .check_box import CheckBox
 from .combo_box import ComboBox, EditableComboBox
