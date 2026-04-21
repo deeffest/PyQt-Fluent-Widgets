@@ -17,6 +17,7 @@ from ...common.style_sheet import FluentStyleSheet, themeColor
 from ...common.screen import getCurrentScreenGeometry
 from ...common.font import getFont, fontStyleSheet
 from ...common.config import isDarkTheme
+from ...common.safe_mode import isSafeMode
 from .scroll_bar import SmoothScrollDelegate
 from .tool_tip import ItemViewToolTipDelegate, ItemViewToolTipType
 
@@ -325,6 +326,11 @@ class RoundMenu(QMenu):
 
         self.aniManager = None
         self.timer = QTimer(self)
+
+        if isSafeMode():
+            self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
+            self.opacityAni.setDuration(150)
+            self.opacityAni.setEasingCurve(QEasingCurve.Type.OutCubic)
 
         self.__initWidgets()
 
@@ -819,8 +825,17 @@ class RoundMenu(QMenu):
 
         self._normalizeMenu()
 
-        self.aniManager = MenuAnimationManager.make(self, aniType)
-        self.aniManager.exec(pos)
+        if isSafeMode():
+            m = self.layout().contentsMargins()
+            self.move(pos.x() - m.left(), pos.y() - m.top())
+
+            if ani:
+                self.opacityAni.setStartValue(0)
+                self.opacityAni.setEndValue(1)
+                self.opacityAni.start()
+        else:
+            self.aniManager = MenuAnimationManager.make(self, aniType)
+            self.aniManager.exec(pos)
 
         self.show()
 

@@ -10,3 +10,4 @@ from .translator import FluentTranslator
 from .router import qrouter, Router
 from .color import FluentThemeColor, FluentSystemColor
 from .theme_listener import SystemThemeListener
+from .safe_mode import isSafeMode, setSafeMode
