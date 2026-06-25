@@ -1,4 +1,7 @@
 # coding:utf-8
+import sys
+_IS_LINUX = sys.platform == "linux"
+
 from enum import Enum
 from typing import List, Union
 
@@ -17,7 +20,6 @@ from ...common.style_sheet import FluentStyleSheet, themeColor
 from ...common.screen import getCurrentScreenGeometry
 from ...common.font import getFont, fontStyleSheet
 from ...common.config import isDarkTheme
-from ...common.safe_mode import isSafeMode
 from .scroll_bar import SmoothScrollDelegate
 from .tool_tip import ItemViewToolTipDelegate, ItemViewToolTipType
 
@@ -327,7 +329,7 @@ class RoundMenu(QMenu):
         self.aniManager = None
         self.timer = QTimer(self)
 
-        if isSafeMode():
+        if _IS_LINUX:
             self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
             self.opacityAni.setDuration(150)
             self.opacityAni.setEasingCurve(QEasingCurve.Type.OutCubic)
@@ -825,7 +827,7 @@ class RoundMenu(QMenu):
 
         self._normalizeMenu()
 
-        if isSafeMode():
+        if _IS_LINUX:
             m = self.layout().contentsMargins()
             self.move(pos.x() - m.left(), pos.y() - m.top())
 
