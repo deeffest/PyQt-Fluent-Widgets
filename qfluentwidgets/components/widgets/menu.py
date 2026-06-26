@@ -1,4 +1,7 @@
 # coding:utf-8
+import sys
+_IS_LINUX = sys.platform == "linux"
+
 from enum import Enum
 from typing import List, Union
 import math
@@ -332,6 +335,11 @@ class RoundMenu(QMenu):
 
         self.aniManager = None
         self.timer = QTimer(self)
+
+        if _IS_LINUX:
+            self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
+            self.opacityAni.setDuration(150)
+            self.opacityAni.setEasingCurve(QEasingCurve.Type.OutCubic)
 
         self.__initWidgets()
 
@@ -839,8 +847,17 @@ class RoundMenu(QMenu):
 
         self._normalizeMenu()
 
-        self.aniManager = MenuAnimationManager.make(self, aniType)
-        self.aniManager.exec(pos)
+        if _IS_LINUX:
+            m = self.layout().contentsMargins()
+            self.move(pos.x() - m.left(), pos.y() - m.top())
+
+            if ani:
+                self.opacityAni.setStartValue(0)
+                self.opacityAni.setEndValue(1)
+                self.opacityAni.start()
+        else:
+            self.aniManager = MenuAnimationManager.make(self, aniType)
+            self.aniManager.exec(pos)
 
         self.show()
 

@@ -3,18 +3,25 @@ from math import floor
 from io import BytesIO
 from typing import Union
 
-import numpy as np
+try:
+    import numpy as np
+    from scipy.ndimage.filters import gaussian_filter
+    _HAS_NUMPY = True
+except RuntimeError:
+    _HAS_NUMPY = False
 from colorthief import ColorThief
 from PIL import Image
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QIODevice, QBuffer
-from scipy.ndimage.filters import gaussian_filter
 
 from .exception_handler import exceptionHandler
 
 
 
 def gaussianBlur(image, blurRadius=18, brightFactor=1, blurPicSize= None):
+    if not _HAS_NUMPY:
+        return QPixmap()
+
     if isinstance(image, str) and not image.startswith(':'):
         image = Image.open(image)
     else:
@@ -182,6 +189,9 @@ class DominantColor:
 
     @staticmethod
     def colorfulness(r: int, g: int, b: int):
+        if not _HAS_NUMPY:
+            return 0
+
         rg = np.absolute(r - g)
         yb = np.absolute(0.5 * (r + g) - b)
 
