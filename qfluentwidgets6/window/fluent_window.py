@@ -17,7 +17,7 @@ from ..components.navigation import (NavigationInterface, NavigationBar, Navigat
                                      NavigationBarPushButton, NavigationTreeWidget)
 from .stacked_widget import StackedWidget
 
-from qframelesswindow import TitleBar, TitleBarBase, TitleBarButton
+from qframelesswindow6 import TitleBar, TitleBarBase, TitleBarButton
 
 
 class FluentWidget(BackgroundAnimationWidget, FramelessWindow):
