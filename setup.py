@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="PyQt-Fluent-Widgets",
+    name="PyQt5-Fluent-Widgets",
     version="1.11.2",
     keywords="pyqt fluent widgets",
     author="zhiyiYo",
@@ -17,8 +17,6 @@ setuptools.setup(
     url="https://qfluentwidgets.com",
     packages=setuptools.find_packages(),
     install_requires=[
-        "PyQt5>=5.15.0",
-        "PyQt5-Frameless-Window>=0.8.0",
         "darkdetect",
     ],
     extras_require = {
