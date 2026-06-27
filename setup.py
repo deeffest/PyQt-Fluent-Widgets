@@ -17,8 +17,6 @@ setuptools.setup(
     url="https://qfluentwidgets.com",
     packages=setuptools.find_packages(),
     install_requires=[
-        "PySide6",
-        "PySideSix-Frameless-Window>=0.8.0",
         "darkdetect",
     ],
     extras_require = {
