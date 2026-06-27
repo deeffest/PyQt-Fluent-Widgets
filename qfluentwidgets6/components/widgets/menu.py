@@ -5,7 +5,7 @@ _IS_LINUX = sys.platform == "linux"
 from enum import Enum
 from typing import List, Union
 
-from qframelesswindow import WindowEffect
+from qframelesswindow6 import WindowEffect
 from PySide6.QtCore import (QEasingCurve, QEvent, QPropertyAnimation, QObject, QModelIndex,
                           Qt, QSize, QRectF, Signal, QPoint, QTimer, QObject, QParallelAnimationGroup, QRect)
 from PySide6.QtGui import (QAction, QIcon, QColor, QPainter, QPen, QPixmap, QRegion, QCursor, QTextCursor, QHoverEvent,
