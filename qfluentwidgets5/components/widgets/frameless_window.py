@@ -1,7 +1,7 @@
 import sys
 
 if sys.platform != "win32" or sys.getwindowsversion().build < 22000:
-    from qframelesswindow import FramelessWindow
+    from qframelesswindow5 import FramelessWindow
 else:
     from ctypes.wintypes import MSG
 
@@ -10,8 +10,8 @@ else:
     from PyQt5.QtGui import QCursor, QMouseEvent
     from PyQt5.QtWidgets import QApplication
 
-    from qframelesswindow import AcrylicWindow as Window
-    from qframelesswindow.titlebar.title_bar_buttons import TitleBarButtonState
+    from qframelesswindow5 import AcrylicWindow as Window
+    from qframelesswindow5.titlebar.title_bar_buttons import TitleBarButtonState
 
 
     class FramelessWindow(Window):

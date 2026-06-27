@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List, Union
 import math
 
-from qframelesswindow import WindowEffect
+from qframelesswindow5 import WindowEffect
 from PyQt5.QtCore import (QEasingCurve, QEvent, QPropertyAnimation, QObject, QModelIndex,
                           Qt, QSize, QRectF, pyqtSignal, QPoint, QTimer, QParallelAnimationGroup, QRect, QPointF)
 from PyQt5.QtGui import (QIcon, QColor, QPainter, QPen, QPixmap, QRegion, QCursor, QTextCursor, QHoverEvent,

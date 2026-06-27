@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsDropShadowEffect
 from ..common.icon import FluentIconBase, drawIcon, toQIcon
 from ..common.style_sheet import isDarkTheme, FluentStyleSheet
 from ..components.widgets import IconWidget
-from qframelesswindow import TitleBar
+from qframelesswindow5 import TitleBar
 
 
 
