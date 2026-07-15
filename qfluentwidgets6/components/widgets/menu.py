@@ -477,7 +477,7 @@ class RoundMenu(QMenu):
         # disable item if the action is not enabled
         if not action.isEnabled():
             item.setFlags(Qt.NoItemFlags)
-        if self._hasExplicitToolTip(action):
+        if action.text() != action.toolTip():
             item.setToolTip(action.toolTip())
 
         item.setData(Qt.UserRole, action)
@@ -795,10 +795,8 @@ class RoundMenu(QMenu):
         item = action.property('item')  # type: QListWidgetItem
         item.setIcon(self._createItemIcon(action))
 
-        if self._hasExplicitToolTip(action):
+        if action.text() != action.toolTip():
             item.setToolTip(action.toolTip())
-        else:
-            item.setToolTip("")
 
         self._adjustItemText(item, action)
 
@@ -876,12 +874,6 @@ class RoundMenu(QMenu):
 
     def paintEvent(self, e):
         pass
-
-    @staticmethod
-    def _hasExplicitToolTip(action: QAction) -> bool:
-        probe = QAction()
-        probe.setText(action.text())
-        return action.toolTip() != probe.toolTip()
 
 
 class MenuAnimationManager(QObject):
