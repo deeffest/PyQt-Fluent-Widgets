@@ -11,6 +11,10 @@ MenuActionListWidget {
     font: 14px --FontFamilies;
 }
 
+MenuActionListWidget[noRadius=true] {
+    border-radius: 0px;
+}
+
 MenuActionListWidget[transparent=true] {
     background-color: transparent;
 }
