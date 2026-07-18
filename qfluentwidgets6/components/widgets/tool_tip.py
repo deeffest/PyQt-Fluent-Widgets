@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
 
 from ...common import FluentStyleSheet
 from ...common.screen import getCurrentScreenGeometry
+from ...common.platform_utils import IS_LINUX
 
 
 class ToolTipPosition(Enum):
@@ -65,12 +66,13 @@ class ToolTip(QFrame):
         self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
         self.opacityAni.setDuration(150)
 
-        # add shadow
-        self.shadowEffect = QGraphicsDropShadowEffect(self)
-        self.shadowEffect.setBlurRadius(25)
-        self.shadowEffect.setColor(QColor(0, 0, 0, 50))
-        self.shadowEffect.setOffset(0, 5)
-        self.container.setGraphicsEffect(self.shadowEffect)
+        if not IS_LINUX:
+            # add shadow
+            self.shadowEffect = QGraphicsDropShadowEffect(self)
+            self.shadowEffect.setBlurRadius(25)
+            self.shadowEffect.setColor(QColor(0, 0, 0, 50))
+            self.shadowEffect.setOffset(0, 5)
+            self.container.setGraphicsEffect(self.shadowEffect)
 
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.hide)
