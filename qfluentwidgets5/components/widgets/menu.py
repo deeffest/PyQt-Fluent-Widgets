@@ -18,7 +18,7 @@ from ...common.style_sheet import FluentStyleSheet, themeColor
 from ...common.screen import getCurrentScreenGeometry
 from ...common.font import getFont, fontStyleSheet
 from ...common.config import isDarkTheme
-from ...common.platform_utils import IS_LINUX
+from ...common.platform_utils import IS_LINUX, hasCompositor
 from .scroll_bar import SmoothScrollDelegate
 from .tool_tip import ItemViewToolTipDelegate, ItemViewToolTipType
 
@@ -351,11 +351,15 @@ class RoundMenu(QMenu):
         self.timer.setInterval(400)
         self.timer.timeout.connect(self._onShowMenuTimeOut)
 
-        if not IS_LINUX:
-            self.setShadowEffect()
+        self.setShadowEffect()
         self.hBoxLayout.addWidget(self.view, 1, Qt.AlignCenter)
 
-        self.hBoxLayout.setContentsMargins(12, 8, 12, 20)
+        if hasCompositor():
+            self.hBoxLayout.setContentsMargins(12, 8, 12, 20)
+        else:
+            self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
+            self.view.setProperty("noRadius", True)
+            self.view.setStyleSheet(self.view.styleSheet())
         FluentStyleSheet.MENU.apply(self)
 
         self.view.itemClicked.connect(self._onItemClicked)

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QGraphicsDropShadowEffect,
 
 from ...common import FluentStyleSheet
 from ...common.screen import getCurrentScreenGeometry
-from ...common.platform_utils import IS_LINUX
+from ...common.platform_utils import hasCompositor
 
 
 class ToolTipPosition(Enum):
@@ -57,7 +57,12 @@ class ToolTip(QFrame):
         self.label = QLabel(text, self)
 
         # set layout
-        self.layout().setContentsMargins(12, 8, 12, 12)
+        if hasCompositor():
+            self.layout().setContentsMargins(12, 8, 12, 12)
+        else:
+            self.layout().setContentsMargins(0, 0, 0, 0)
+            self.container.setProperty("noRadius", True)
+            self.container.setStyleSheet(self.container.styleSheet())
         self.layout().addWidget(self.container)
         self.containerLayout.addWidget(self.label)
         self.containerLayout.setContentsMargins(8, 6, 8, 6)
@@ -66,13 +71,12 @@ class ToolTip(QFrame):
         self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
         self.opacityAni.setDuration(150)
 
-        if not IS_LINUX:
-            # add shadow
-            self.shadowEffect = QGraphicsDropShadowEffect(self)
-            self.shadowEffect.setBlurRadius(25)
-            self.shadowEffect.setColor(QColor(0, 0, 0, 50))
-            self.shadowEffect.setOffset(0, 5)
-            self.container.setGraphicsEffect(self.shadowEffect)
+        # add shadow
+        self.shadowEffect = QGraphicsDropShadowEffect(self)
+        self.shadowEffect.setBlurRadius(25)
+        self.shadowEffect.setColor(QColor(0, 0, 0, 50))
+        self.shadowEffect.setOffset(0, 5)
+        self.container.setGraphicsEffect(self.shadowEffect)
 
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.hide)

@@ -8,6 +8,10 @@ ToolTip > #container {
     border-radius: 4px;
 }
 
+ToolTip > #container[noRadius=true] {
+    border-radius: 0px;
+}
+
 ToolTip>#container[transparent=true] {
     background-color: transparent;
     border: 1px solid rgba(0, 0, 0, 50);
