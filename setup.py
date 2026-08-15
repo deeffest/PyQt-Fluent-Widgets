@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="PySide6-Fluent-Widgets",
-    version="1.11.2+20260719",
+    version="1.11.3+20260815",
     packages=setuptools.find_packages(),
     install_requires=[
         "darkdetect",
