@@ -2,8 +2,19 @@
 from typing import List, Union
 
 from PyQt5.QtCore import Qt, pyqtProperty, QPoint, pyqtSignal, QSize, QRectF, QUrl
-from PyQt5.QtGui import (QPixmap, QPainter, QPalette, QColor, QFont, QImage, QPainterPath,
-                         QImageReader, QBrush, QMovie, QDesktopServices)
+from PyQt5.QtGui import (
+    QPixmap,
+    QPainter,
+    QPalette,
+    QColor,
+    QFont,
+    QImage,
+    QPainterPath,
+    QImageReader,
+    QBrush,
+    QMovie,
+    QDesktopServices,
+)
 from PyQt5.QtWidgets import QLabel, QWidget, QApplication, QPushButton
 
 from ...common.overload import singledispatchmethod
@@ -14,7 +25,7 @@ from .menu import LabelContextMenu
 
 
 class PixmapLabel(QLabel):
-    """ Label for high dpi pixmap """
+    """Label for high dpi pixmap"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -33,14 +44,13 @@ class PixmapLabel(QLabel):
             return super().paintEvent(e)
 
         painter = QPainter(self)
-        painter.setRenderHints(QPainter.Antialiasing |
-                               QPainter.SmoothPixmapTransform)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
         painter.setPen(Qt.NoPen)
         painter.drawPixmap(self.rect(), self.__pixmap)
 
 
 class FluentLabelBase(QLabel):
-    """ Fluent label base class
+    """Fluent label base class
 
     Constructors
     ------------
@@ -62,7 +72,9 @@ class FluentLabelBase(QLabel):
         FluentStyleSheet.LABEL.apply(self)
         self.setFont(self.getFont())
         self.setTextColor()
-        connect = qconfig.themeChanged.connect(lambda: self.setTextColor(self.lightColor, self.darkColor))
+        connect = qconfig.themeChanged.connect(
+            lambda: self.setTextColor(self.lightColor, self.darkColor)
+        )
         self.destroyed.connect(lambda: self.disconnect(connect))
 
         self.customContextMenuRequested.connect(self._onContextMenuRequested)
@@ -72,7 +84,7 @@ class FluentLabelBase(QLabel):
         raise NotImplementedError
 
     def setTextColor(self, light=QColor(0, 0, 0), dark=QColor(255, 255, 255)):
-        """ set the text color of label
+        """set the text color of label
 
         Parameters
         ----------
@@ -85,7 +97,7 @@ class FluentLabelBase(QLabel):
         setCustomStyleSheet(
             self,
             f"FluentLabelBase{{color:{self.lightColor.name(QColor.NameFormat.HexArgb)}}}",
-            f"FluentLabelBase{{color:{self.darkColor.name(QColor.NameFormat.HexArgb)}}}"
+            f"FluentLabelBase{{color:{self.darkColor.name(QColor.NameFormat.HexArgb)}}}",
         )
 
     @pyqtProperty(QColor)
@@ -141,7 +153,7 @@ class FluentLabelBase(QLabel):
 
 
 class CaptionLabel(FluentLabelBase):
-    """ Caption text label
+    """Caption text label
 
     Constructors
     ------------
@@ -154,7 +166,7 @@ class CaptionLabel(FluentLabelBase):
 
 
 class BodyLabel(FluentLabelBase):
-    """ Body text label
+    """Body text label
 
     Constructors
     ------------
@@ -167,7 +179,7 @@ class BodyLabel(FluentLabelBase):
 
 
 class StrongBodyLabel(FluentLabelBase):
-    """ Strong body text label
+    """Strong body text label
 
     Constructors
     ------------
@@ -180,7 +192,7 @@ class StrongBodyLabel(FluentLabelBase):
 
 
 class SubtitleLabel(FluentLabelBase):
-    """ Subtitle text label
+    """Subtitle text label
 
     Constructors
     ------------
@@ -193,7 +205,7 @@ class SubtitleLabel(FluentLabelBase):
 
 
 class TitleLabel(FluentLabelBase):
-    """ Sub title text label
+    """Sub title text label
 
     Constructors
     ------------
@@ -206,7 +218,7 @@ class TitleLabel(FluentLabelBase):
 
 
 class LargeTitleLabel(FluentLabelBase):
-    """ Large title text label
+    """Large title text label
 
     Constructors
     ------------
@@ -219,7 +231,7 @@ class LargeTitleLabel(FluentLabelBase):
 
 
 class DisplayLabel(FluentLabelBase):
-    """ Display text label
+    """Display text label
 
     Constructors
     ------------
@@ -232,7 +244,7 @@ class DisplayLabel(FluentLabelBase):
 
 
 class ImageLabel(QLabel):
-    """ Image label
+    """Image label
 
     Constructors
     ------------
@@ -271,8 +283,10 @@ class ImageLabel(QLabel):
         self.image = self.movie().currentImage()
         self.update()
 
-    def setBorderRadius(self, topLeft: int, topRight: int, bottomLeft: int, bottomRight: int):
-        """ set the border radius of image """
+    def setBorderRadius(
+        self, topLeft: int, topRight: int, bottomLeft: int, bottomRight: int
+    ):
+        """set the border radius of image"""
         self._topLeftRadius = topLeft
         self._topRightRadius = topRight
         self._bottomLeftRadius = bottomLeft
@@ -280,7 +294,7 @@ class ImageLabel(QLabel):
         self.update()
 
     def setImage(self, image: Union[str, QPixmap, QImage] = None):
-        """ set the image of label """
+        """set the image of label"""
         self.image = image or QImage()
 
         if isinstance(image, str):
@@ -384,7 +398,10 @@ class ImageLabel(QLabel):
 
         # draw image
         image = self.image.scaled(
-            self.size()*self.devicePixelRatioF(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            self.size() * self.devicePixelRatioF(),
+            Qt.IgnoreAspectRatio,
+            Qt.SmoothTransformation,
+        )
 
         painter.setPen(Qt.NoPen)
         painter.setClipPath(path)
@@ -396,7 +413,9 @@ class ImageLabel(QLabel):
 
     @topLeftRadius.setter
     def topLeftRadius(self, radius: int):
-        self.setBorderRadius(radius, self.topRightRadius, self.bottomLeftRadius, self.bottomRightRadius)
+        self.setBorderRadius(
+            radius, self.topRightRadius, self.bottomLeftRadius, self.bottomRightRadius
+        )
 
     @pyqtProperty(int)
     def topRightRadius(self):
@@ -404,7 +423,9 @@ class ImageLabel(QLabel):
 
     @topRightRadius.setter
     def topRightRadius(self, radius: int):
-        self.setBorderRadius(self.topLeftRadius, radius, self.bottomLeftRadius, self.bottomRightRadius)
+        self.setBorderRadius(
+            self.topLeftRadius, radius, self.bottomLeftRadius, self.bottomRightRadius
+        )
 
     @pyqtProperty(int)
     def bottomLeftRadius(self):
@@ -412,7 +433,9 @@ class ImageLabel(QLabel):
 
     @bottomLeftRadius.setter
     def bottomLeftRadius(self, radius: int):
-        self.setBorderRadius(self.topLeftRadius, self.topRightRadius, radius, self.bottomRightRadius)
+        self.setBorderRadius(
+            self.topLeftRadius, self.topRightRadius, radius, self.bottomRightRadius
+        )
 
     @pyqtProperty(int)
     def bottomRightRadius(self):
@@ -421,11 +444,12 @@ class ImageLabel(QLabel):
     @bottomRightRadius.setter
     def bottomRightRadius(self, radius: int):
         self.setBorderRadius(
-            self.topLeftRadius, self.topRightRadius, self.bottomLeftRadius, radius)
+            self.topLeftRadius, self.topRightRadius, self.bottomLeftRadius, radius
+        )
 
 
 class AvatarWidget(ImageLabel):
-    """ Avatar widget
+    """Avatar widget
 
     Constructors
     ------------
@@ -444,7 +468,7 @@ class AvatarWidget(ImageLabel):
     def setRadius(self, radius: int):
         self._radius = radius
         setFont(self, radius)
-        self.setFixedSize(2*radius, 2*radius)
+        self.setFixedSize(2 * radius, 2 * radius)
         self.update()
 
     def setImage(self, image: Union[str, QPixmap, QImage] = None):
@@ -468,7 +492,10 @@ class AvatarWidget(ImageLabel):
     def _drawImageAvatar(self, painter: QPainter):
         # center crop image
         image = self.image.scaled(
-            self.size()*self.devicePixelRatioF(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)  # type: QImage
+            self.size() * self.devicePixelRatioF(),
+            Qt.KeepAspectRatioByExpanding,
+            Qt.SmoothTransformation,
+        )  # type: QImage
 
         iw, ih = image.width(), image.height()
         d = self.getRadius() * 2 * self.devicePixelRatioF()
@@ -487,7 +514,9 @@ class AvatarWidget(ImageLabel):
         if not self.text():
             return
 
-        painter.setBrush(self.darkBackgroundColor if isDarkTheme() else self.lightBackgroundColor)
+        painter.setBrush(
+            self.darkBackgroundColor if isDarkTheme() else self.lightBackgroundColor
+        )
         painter.setPen(Qt.NoPen)
         painter.drawEllipse(QRectF(self.rect()))
 
@@ -499,7 +528,7 @@ class AvatarWidget(ImageLabel):
 
 
 class HyperlinkLabel(QPushButton):
-    """ Hyperlink label
+    """Hyperlink label
 
     Constructors
     ------------
@@ -541,7 +570,7 @@ class HyperlinkLabel(QPushButton):
 
     def setUnderlineVisible(self, isVisible: bool):
         self._isUnderlineVisible = isVisible
-        self.setProperty('underline', isVisible)
+        self.setProperty("underline", isVisible)
         self.setStyle(QApplication.style())
 
     def _onClicked(self):

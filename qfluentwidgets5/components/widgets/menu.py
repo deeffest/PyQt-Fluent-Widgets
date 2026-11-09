@@ -4,13 +4,53 @@ from typing import List, Union
 import math
 
 from qframelesswindow5 import WindowEffect
-from PyQt5.QtCore import (QEasingCurve, QEvent, QPropertyAnimation, QObject, QModelIndex,
-                          Qt, QSize, QRectF, pyqtSignal, QPoint, QTimer, QParallelAnimationGroup, QRect, QPointF)
-from PyQt5.QtGui import (QIcon, QColor, QPainter, QPen, QPixmap, QRegion, QCursor, QTextCursor, QHoverEvent,
-                         QFontMetrics, QKeySequence, QTextLayout)
-from PyQt5.QtWidgets import (QAction, QApplication, QMenu, QProxyStyle, QStyle,
-                             QGraphicsDropShadowEffect, QListWidget, QWidget, QHBoxLayout,
-                             QListWidgetItem, QLineEdit, QTextEdit, QStyledItemDelegate, QStyleOptionViewItem, QLabel)
+from PyQt5.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QPropertyAnimation,
+    QObject,
+    QModelIndex,
+    Qt,
+    QSize,
+    QRectF,
+    pyqtSignal,
+    QPoint,
+    QTimer,
+    QParallelAnimationGroup,
+    QRect,
+    QPointF,
+)
+from PyQt5.QtGui import (
+    QIcon,
+    QColor,
+    QPainter,
+    QPen,
+    QPixmap,
+    QRegion,
+    QCursor,
+    QTextCursor,
+    QHoverEvent,
+    QFontMetrics,
+    QKeySequence,
+    QTextLayout,
+)
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QMenu,
+    QProxyStyle,
+    QStyle,
+    QGraphicsDropShadowEffect,
+    QListWidget,
+    QWidget,
+    QHBoxLayout,
+    QListWidgetItem,
+    QLineEdit,
+    QTextEdit,
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
+    QLabel,
+)
 
 from ...common.icon import FluentIcon as FIF
 from ...common.icon import FluentIconEngine, Action, FluentIconBase, Icon
@@ -24,7 +64,7 @@ from .tool_tip import ItemViewToolTipDelegate, ItemViewToolTipType
 
 
 class CustomMenuStyle(QProxyStyle):
-    """ Custom menu style """
+    """Custom menu style"""
 
     def __init__(self, iconSize=14):
         """
@@ -44,13 +84,14 @@ class CustomMenuStyle(QProxyStyle):
 
 
 class DWMMenu(QMenu):
-    """ A menu with DWM shadow """
+    """A menu with DWM shadow"""
 
     def __init__(self, title="", parent=None):
         super().__init__(title, parent)
         self.windowEffect = WindowEffect(self)
         self.setWindowFlags(
-            Qt.FramelessWindowHint | Qt.Popup | Qt.NoDropShadowWindowHint)
+            Qt.FramelessWindowHint | Qt.Popup | Qt.NoDropShadowWindowHint
+        )
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyle(CustomMenuStyle())
         FluentStyleSheet.MENU.apply(self)
@@ -62,7 +103,7 @@ class DWMMenu(QMenu):
 
 
 class MenuAnimationType(Enum):
-    """ Menu animation type """
+    """Menu animation type"""
 
     NONE = 0
     DROP_DOWN = 1
@@ -71,9 +112,8 @@ class MenuAnimationType(Enum):
     FADE_IN_PULL_UP = 4
 
 
-
 class SubMenuItemWidget(QWidget):
-    """ Sub menu item """
+    """Sub menu item"""
 
     showMenuSig = pyqtSignal(QListWidgetItem)
 
@@ -103,12 +143,13 @@ class SubMenuItemWidget(QWidget):
         painter.setRenderHints(QPainter.Antialiasing)
 
         # draw right arrow
-        FIF.CHEVRON_RIGHT.render(painter, QRectF(
-            self.width()-10, self.height()/2-9/2, 9, 9))
+        FIF.CHEVRON_RIGHT.render(
+            painter, QRectF(self.width() - 10, self.height() / 2 - 9 / 2, 9, 9)
+        )
 
 
 class MenuItemDelegate(QStyledItemDelegate):
-    """ Menu item delegate """
+    """Menu item delegate"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -135,15 +176,19 @@ class MenuItemDelegate(QStyledItemDelegate):
 
     def helpEvent(self, event, view, option, index):
         if not self.tooltipDelegate:
-            self.tooltipDelegate = ItemViewToolTipDelegate(view, 100, ItemViewToolTipType.LIST)
+            self.tooltipDelegate = ItemViewToolTipDelegate(
+                view, 100, ItemViewToolTipType.LIST
+            )
 
         return self.tooltipDelegate.helpEvent(event, view, option, index)
 
 
 class ShortcutMenuItemDelegate(MenuItemDelegate):
-    """ Shortcut key menu item delegate """
+    """Shortcut key menu item delegate"""
 
-    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
+    def paint(
+        self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         super().paint(painter, option, index)
         if self._isSeparator(index):
             return
@@ -160,7 +205,9 @@ class ShortcutMenuItemDelegate(MenuItemDelegate):
 
         font = getFont(12)
         painter.setFont(font)
-        painter.setPen(QColor(255, 255, 255, 200) if isDarkTheme() else QColor(0, 0, 0, 153))
+        painter.setPen(
+            QColor(255, 255, 255, 200) if isDarkTheme() else QColor(0, 0, 0, 153)
+        )
 
         shortcut = action.shortcut().toString(QKeySequence.NativeText)
 
@@ -172,7 +219,10 @@ class ShortcutMenuItemDelegate(MenuItemDelegate):
         layout.endLayout()
 
         # draw text
-        y = option.rect.y() + (option.rect.height() - layout.boundingRect().height()) / 2
+        y = (
+            option.rect.y()
+            + (option.rect.height() - layout.boundingRect().height()) / 2
+        )
         x = option.rect.right() - layout.boundingRect().width() - 20
         layout.draw(painter, QPointF(x, y))
 
@@ -180,12 +230,14 @@ class ShortcutMenuItemDelegate(MenuItemDelegate):
 
 
 class MenuActionListWidget(QListWidget):
-    """ Menu action list widget """
+    """Menu action list widget"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._itemHeight = 28
-        self._maxVisibleItems = -1  # adjust visible items according to the size of screen
+        self._maxVisibleItems = (
+            -1
+        )  # adjust visible items according to the size of screen
 
         self.setViewportMargins(0, 6, 0, 6)
         self.setTextElideMode(Qt.ElideNone)
@@ -195,23 +247,23 @@ class MenuActionListWidget(QListWidget):
         self.setItemDelegate(ShortcutMenuItemDelegate(self))
 
         self.scrollDelegate = SmoothScrollDelegate(self)
-        self.setStyleSheet('MenuActionListWidget{' + fontStyleSheet(getFont()) + '}')
+        self.setStyleSheet("MenuActionListWidget{" + fontStyleSheet(getFont()) + "}")
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def insertItem(self, row, item):
-        """ inserts menu item at the position in the list given by row """
+        """inserts menu item at the position in the list given by row"""
         super().insertItem(row, item)
         self.adjustSize()
 
     def addItem(self, item):
-        """ add menu item at the end """
+        """add menu item at the end"""
         super().addItem(item)
         self.adjustSize()
 
     def takeItem(self, row):
-        """ delete item from list """
+        """delete item from list"""
         item = super().takeItem(row)
         self.adjustSize()
         return item
@@ -244,10 +296,12 @@ class MenuActionListWidget(QListWidget):
             visible_count = sum(
                 not self.item(i).isHidden() for i in range(self.count())
             )
-            size.setHeight(min(
-                size.height(),
-                visible_count * self._itemHeight + m.top() + m.bottom() + 3
-            ))
+            size.setHeight(
+                min(
+                    size.height(),
+                    visible_count * self._itemHeight + m.top() + m.bottom() + 3,
+                )
+            )
 
         self.setFixedSize(size)
 
@@ -262,19 +316,19 @@ class MenuActionListWidget(QListWidget):
             itm = self.item(i)
             if itm.data(Qt.DecorationRole) == "seperator":
                 prev_visible = any(
-                    not self.item(j).isHidden() and
-                    self.item(j).data(Qt.DecorationRole) != "seperator"
+                    not self.item(j).isHidden()
+                    and self.item(j).data(Qt.DecorationRole) != "seperator"
                     for j in range(i - 1, -1, -1)
                 )
                 next_visible = any(
-                    not self.item(j).isHidden() and
-                    self.item(j).data(Qt.DecorationRole) != "seperator"
+                    not self.item(j).isHidden()
+                    and self.item(j).data(Qt.DecorationRole) != "seperator"
                     for j in range(i + 1, count)
                 )
                 itm.setHidden(not (prev_visible and next_visible))
 
     def setItemHeight(self, height: int):
-        """ set the height of item """
+        """set the height of item"""
         if height == self._itemHeight:
             return
 
@@ -287,7 +341,7 @@ class MenuActionListWidget(QListWidget):
         self.adjustSize()
 
     def setMaxVisibleItems(self, num: int):
-        """ set the maximum visible items """
+        """set the maximum visible items"""
         self._maxVisibleItems = num
         self.adjustSize()
 
@@ -295,21 +349,25 @@ class MenuActionListWidget(QListWidget):
         return self._maxVisibleItems
 
     def heightForAnimation(self, pos: QPoint, aniType: MenuAnimationType):
-        """ height for animation """
+        """height for animation"""
         ih = self.itemsHeight()
         _, sh = MenuAnimationManager.make(self, aniType).availableViewSize(pos)
         return min(ih, sh)
 
     def itemsHeight(self):
-        """ Return the height of all items """
-        N = self.count() if self.maxVisibleItems() < 0 else min(self.maxVisibleItems(), self.count())
+        """Return the height of all items"""
+        N = (
+            self.count()
+            if self.maxVisibleItems() < 0
+            else min(self.maxVisibleItems(), self.count())
+        )
         h = sum(self.item(i).sizeHint().height() for i in range(N))
         m = self.viewportMargins()
         return h + m.top() + m.bottom()
 
 
 class RoundMenu(QMenu):
-    """ Round corner menu """
+    """Round corner menu"""
 
     closedSignal = pyqtSignal()
 
@@ -335,15 +393,16 @@ class RoundMenu(QMenu):
         self.timer = QTimer(self)
 
         if IS_LINUX:
-            self.opacityAni = QPropertyAnimation(self, b'windowOpacity', self)
+            self.opacityAni = QPropertyAnimation(self, b"windowOpacity", self)
             self.opacityAni.setDuration(150)
             self.opacityAni.setEasingCurve(QEasingCurve.Type.OutCubic)
 
         self.__initWidgets()
 
     def __initWidgets(self):
-        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint |
-                            Qt.NoDropShadowWindowHint)
+        self.setWindowFlags(
+            Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
+        )
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setMouseTracking(True)
 
@@ -366,12 +425,12 @@ class RoundMenu(QMenu):
         self.view.itemEntered.connect(self._onItemEntered)
 
     def setMaxVisibleItems(self, num: int):
-        """ set the maximum visible items """
+        """set the maximum visible items"""
         self.view.setMaxVisibleItems(num)
         self.adjustSize()
 
     def setItemHeight(self, height):
-        """ set the height of menu item """
+        """set the height of menu item"""
         if height == self.itemHeight:
             return
 
@@ -379,7 +438,7 @@ class RoundMenu(QMenu):
         self.view.setItemHeight(height)
 
     def setShadowEffect(self, blurRadius=30, offset=(0, 8), color=QColor(0, 0, 0, 30)):
-        """ add shadow to dialog """
+        """add shadow to dialog"""
         self.shadowEffect = QGraphicsDropShadowEffect(self.view)
         self.shadowEffect.setBlurRadius(blurRadius)
         self.shadowEffect.setOffset(*offset)
@@ -405,7 +464,7 @@ class RoundMenu(QMenu):
         return self._title
 
     def clear(self):
-        """ clear all actions """
+        """clear all actions"""
         while self._actions:
             self.removeAction(self._actions[-1])
 
@@ -413,7 +472,7 @@ class RoundMenu(QMenu):
             self.removeMenu(self._subMenus[-1])
 
     def setIcon(self, icon: Union[QIcon, FluentIconBase]):
-        """ set the icon of menu """
+        """set the icon of menu"""
         if isinstance(icon, FluentIconBase):
             icon = Icon(icon)
 
@@ -424,7 +483,7 @@ class RoundMenu(QMenu):
         super().setTitle(title)
 
     def addAction(self, action: Union[QAction, Action]):
-        """ add action to menu
+        """add action to menu
 
         Parameters
         ----------
@@ -436,7 +495,7 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def addWidget(self, widget: QWidget, selectable=True, onClick=None):
-        """ add custom widget
+        """add custom widget
 
         Parameters
         ----------
@@ -450,7 +509,7 @@ class RoundMenu(QMenu):
             the slot connected to item clicked signal
         """
         action = QAction()
-        action.setProperty('selectable', selectable)
+        action.setProperty("selectable", selectable)
 
         item = self._createActionItem(action)
         item.setSizeHint(widget.size())
@@ -467,7 +526,7 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def _createActionItem(self, action: QAction, before=None):
-        """ create menu action item  """
+        """create menu action item"""
         if not before:
             self._actions.append(action)
             super().addAction(action)
@@ -476,7 +535,7 @@ class RoundMenu(QMenu):
             self._actions.insert(index, action)
             super().insertAction(before, action)
         else:
-            raise ValueError('`before` is not in the action list')
+            raise ValueError("`before` is not in the action list")
 
         item = QListWidgetItem(self._createItemIcon(action), action.text())
         self._adjustItemText(item, action)
@@ -488,15 +547,15 @@ class RoundMenu(QMenu):
             item.setToolTip(action.toolTip())
 
         item.setData(Qt.UserRole, action)
-        action.setProperty('item', item)
+        action.setProperty("item", item)
         action.changed.connect(self._onActionChanged)
         return item
 
     def _hasItemIcon(self):
-        return any(not i.icon().isNull() for i in self._actions+self._subMenus)
+        return any(not i.icon().isNull() for i in self._actions + self._subMenus)
 
     def _adjustItemText(self, item: QListWidgetItem, action: QAction):
-        """ adjust the text of item """
+        """adjust the text of item"""
         # leave some space for shortcut key
         if isinstance(self.view.itemDelegate(), ShortcutMenuItemDelegate):
             sw = self._longestShortcutWidth()
@@ -519,7 +578,7 @@ class RoundMenu(QMenu):
         return w
 
     def _longestShortcutWidth(self):
-        """ longest shortcut key """
+        """longest shortcut key"""
         font = getFont(12)
         maxWidth = 0
 
@@ -540,7 +599,7 @@ class RoundMenu(QMenu):
         return math.ceil(maxWidth)
 
     def _createItemIcon(self, w):
-        """ create the icon of menu item """
+        """create the icon of menu item"""
         hasIcon = self._hasItemIcon()
         icon = QIcon(FluentIconEngine(w.icon()))
 
@@ -553,12 +612,14 @@ class RoundMenu(QMenu):
 
         return icon
 
-    def insertAction(self, before: Union[QAction, Action], action: Union[QAction, Action]):
-        """ inserts action to menu, before the action before """
+    def insertAction(
+        self, before: Union[QAction, Action], action: Union[QAction, Action]
+    ):
+        """inserts action to menu, before the action before"""
         if before not in self._actions:
             return
 
-        beforeItem = before.property('item')
+        beforeItem = before.property("item")
         if not beforeItem:
             return
 
@@ -568,7 +629,7 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def addActions(self, actions: List[Union[QAction, Action]]):
-        """ add actions to menu
+        """add actions to menu
 
         Parameters
         ----------
@@ -578,20 +639,22 @@ class RoundMenu(QMenu):
         for action in actions:
             self.addAction(action)
 
-    def insertActions(self, before: Union[QAction, Action], actions: List[Union[QAction, Action]]):
-        """ inserts the actions actions to menu, before the action before """
+    def insertActions(
+        self, before: Union[QAction, Action], actions: List[Union[QAction, Action]]
+    ):
+        """inserts the actions actions to menu, before the action before"""
         for action in actions:
             self.insertAction(before, action)
 
     def removeAction(self, action: Union[QAction, Action]):
-        """ remove action from menu """
+        """remove action from menu"""
         if action not in self._actions:
             return
 
         # remove action
         item = action.property("item")
         self._actions.remove(action)
-        action.setProperty('item', None)
+        action.setProperty("item", None)
 
         if not item:
             return
@@ -601,7 +664,7 @@ class RoundMenu(QMenu):
         super().removeAction(action)
 
     def removeMenu(self, menu):
-        """ remove submenu """
+        """remove submenu"""
         if menu not in self._subMenus:
             return
 
@@ -610,7 +673,7 @@ class RoundMenu(QMenu):
         self._removeItem(item)
 
     def setDefaultAction(self, action: Union[QAction, Action]):
-        """ set the default action """
+        """set the default action"""
         if action not in self._actions:
             return
 
@@ -631,7 +694,7 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def addMenu(self, menu):
-        """ add sub menu
+        """add sub menu
 
         Parameters
         ----------
@@ -639,7 +702,7 @@ class RoundMenu(QMenu):
             sub round menu
         """
         if not isinstance(menu, RoundMenu):
-            raise ValueError('`menu` should be an instance of `RoundMenu`.')
+            raise ValueError("`menu` should be an instance of `RoundMenu`.")
 
         item, w = self._createSubMenuItem(menu)
         self.view.addItem(item)
@@ -647,15 +710,15 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def insertMenu(self, before: Union[QAction, Action], menu):
-        """ insert menu before action `before` """
+        """insert menu before action `before`"""
         if not isinstance(menu, RoundMenu):
-            raise ValueError('`menu` should be an instance of `RoundMenu`.')
+            raise ValueError("`menu` should be an instance of `RoundMenu`.")
 
         if before not in self._actions:
-            raise ValueError('`before` should be in menu action list')
+            raise ValueError("`before` should be in menu action list")
 
         item, w = self._createSubMenuItem(menu)
-        self.view.insertItem(self.view.row(before.property('item')), item)
+        self.view.insertItem(self.view.row(before.property("item")), item)
         self.view.setItemWidget(item, w)
         self.adjustSize()
 
@@ -690,7 +753,7 @@ class RoundMenu(QMenu):
             widget.deleteLater()
 
     def _showSubMenu(self, item):
-        """ show sub menu """
+        """show sub menu"""
         self.lastHoverItem = item
         self.lastHoverSubMenuItem = item
         # delay 400 ms to anti-shake
@@ -698,7 +761,10 @@ class RoundMenu(QMenu):
         self.timer.start()
 
     def _onShowMenuTimeOut(self):
-        if self.lastHoverSubMenuItem is None or not self.lastHoverItem is self.lastHoverSubMenuItem:
+        if (
+            self.lastHoverSubMenuItem is None
+            or not self.lastHoverItem is self.lastHoverSubMenuItem
+        ):
             return
 
         w = self.view.itemWidget(self.lastHoverSubMenuItem)
@@ -723,9 +789,9 @@ class RoundMenu(QMenu):
         w.menu.exec(QPoint(x, y))
 
     def addSeparator(self):
-        """ add seperator to menu """
+        """add seperator to menu"""
         m = self.view.viewportMargins()
-        w = self.view.width()-m.left()-m.right()
+        w = self.view.width() - m.left() - m.right()
 
         # add separator to list widget
         item = QListWidgetItem()
@@ -740,7 +806,7 @@ class RoundMenu(QMenu):
         if action not in self._actions or not action.isEnabled():
             return
 
-        if self.view.itemWidget(item) and not action.property('selectable'):
+        if self.view.itemWidget(item) and not action.property("selectable"):
             return
 
         self._hideMenu(False)
@@ -804,18 +870,20 @@ class RoundMenu(QMenu):
 
         # get the rect of menu item
         margin = view.viewportMargins()
-        rect = view.visualItemRect(self.menuItem).translated(
-            view.mapToGlobal(QPoint()))
-        rect = rect.translated(margin.left(), margin.top()+2)
-        if self.parentMenu.geometry().contains(pos) and not rect.contains(pos) and \
-                not self.geometry().contains(pos):
+        rect = view.visualItemRect(self.menuItem).translated(view.mapToGlobal(QPoint()))
+        rect = rect.translated(margin.left(), margin.top() + 2)
+        if (
+            self.parentMenu.geometry().contains(pos)
+            and not rect.contains(pos)
+            and not self.geometry().contains(pos)
+        ):
             view.clearSelection()
             self._hideMenu(False)
 
     def _onActionChanged(self):
-        """ action changed slot """
+        """action changed slot"""
         action = self.sender()  # type: QAction
-        item = action.property('item')  # type: QListWidgetItem
+        item = action.property("item")  # type: QListWidgetItem
         item.setIcon(self._createItemIcon(action))
 
         if action.text() != action.toolTip():
@@ -832,7 +900,7 @@ class RoundMenu(QMenu):
         self.adjustSize()
 
     def exec(self, pos, ani=True, aniType=MenuAnimationType.DROP_DOWN):
-        """ show menu
+        """show menu
 
         Parameters
         ----------
@@ -845,7 +913,7 @@ class RoundMenu(QMenu):
         aniType: MenuAnimationType
             menu animation type
         """
-        #if self.isVisible():
+        # if self.isVisible():
         #    aniType = MenuAnimationType.NONE
 
         self._normalizeMenu()
@@ -868,7 +936,7 @@ class RoundMenu(QMenu):
             self.menuItem.setSelected(True)
 
     def exec_(self, pos: QPoint, ani=True, aniType=MenuAnimationType.DROP_DOWN):
-        """ show menu
+        """show menu
 
         Parameters
         ----------
@@ -900,14 +968,14 @@ class RoundMenu(QMenu):
 
 
 class MenuAnimationManager(QObject):
-    """ Menu animation manager """
+    """Menu animation manager"""
 
     managers = {}
 
     def __init__(self, menu: RoundMenu):
         super().__init__()
         self.menu = menu
-        self.ani = QPropertyAnimation(menu, b'pos', menu)
+        self.ani = QPropertyAnimation(menu, b"pos", menu)
 
         self.ani.setDuration(250)
         self.ani.setEasingCurve(QEasingCurve.OutQuad)
@@ -918,7 +986,7 @@ class MenuAnimationManager(QObject):
         pass
 
     def availableViewSize(self, pos: QPoint):
-        """ Return the available size of view """
+        """Return the available size of view"""
         ss = getCurrentScreenGeometry()
         w, h = ss.width() - 100, ss.height() - 100
         return w, h
@@ -949,13 +1017,14 @@ class MenuAnimationManager(QObject):
 
     @classmethod
     def register(cls, name):
-        """ register menu animation manager
+        """register menu animation manager
 
         Parameters
         ----------
         name: Any
             the name of manager, it should be unique
         """
+
         def wrapper(Manager):
             if name not in cls.managers:
                 cls.managers[name] = Manager
@@ -967,14 +1036,14 @@ class MenuAnimationManager(QObject):
     @classmethod
     def make(cls, menu: RoundMenu, aniType: MenuAnimationType):
         if aniType not in cls.managers:
-            raise ValueError(f'`{aniType}` is an invalid menu animation type.')
+            raise ValueError(f"`{aniType}` is an invalid menu animation type.")
 
         return cls.managers[aniType](menu)
 
 
 @MenuAnimationManager.register(MenuAnimationType.NONE)
 class DummyMenuAnimationManager(MenuAnimationManager):
-    """ Dummy menu animation manager """
+    """Dummy menu animation manager"""
 
     def exec(self, pos: QPoint):
         self.menu.move(self._endPosition(pos))
@@ -982,13 +1051,13 @@ class DummyMenuAnimationManager(MenuAnimationManager):
 
 @MenuAnimationManager.register(MenuAnimationType.DROP_DOWN)
 class DropDownMenuAnimationManager(MenuAnimationManager):
-    """ Drop down menu animation manager """
+    """Drop down menu animation manager"""
 
     def exec(self, pos):
         pos = self._endPosition(pos)
         h = self.menu.height() + 5
 
-        self.ani.setStartValue(pos-QPoint(0, int(h/2)))
+        self.ani.setStartValue(pos - QPoint(0, int(h / 2)))
         self.ani.setEndValue(pos)
         self.ani.start()
 
@@ -1004,7 +1073,7 @@ class DropDownMenuAnimationManager(MenuAnimationManager):
 
 @MenuAnimationManager.register(MenuAnimationType.PULL_UP)
 class PullUpMenuAnimationManager(MenuAnimationManager):
-    """ Pull up menu animation manager """
+    """Pull up menu animation manager"""
 
     def _endPosition(self, pos):
         m = self.menu
@@ -1018,7 +1087,7 @@ class PullUpMenuAnimationManager(MenuAnimationManager):
         pos = self._endPosition(pos)
         h = self.menu.height() + 5
 
-        self.ani.setStartValue(pos+QPoint(0, int(h/2)))
+        self.ani.setStartValue(pos + QPoint(0, int(h / 2)))
         self.ani.setEndValue(pos)
         self.ani.start()
 
@@ -1034,11 +1103,11 @@ class PullUpMenuAnimationManager(MenuAnimationManager):
 
 @MenuAnimationManager.register(MenuAnimationType.FADE_IN_DROP_DOWN)
 class FadeInDropDownMenuAnimationManager(MenuAnimationManager):
-    """ Fade in drop down menu animation manager """
+    """Fade in drop down menu animation manager"""
 
     def __init__(self, menu: RoundMenu):
         super().__init__(menu)
-        self.opacityAni = QPropertyAnimation(menu, b'windowOpacity', self)
+        self.opacityAni = QPropertyAnimation(menu, b"windowOpacity", self)
         self.aniGroup = QParallelAnimationGroup(self)
         self.aniGroup.addAnimation(self.ani)
         self.aniGroup.addAnimation(self.opacityAni)
@@ -1051,7 +1120,7 @@ class FadeInDropDownMenuAnimationManager(MenuAnimationManager):
         self.opacityAni.setDuration(150)
         self.opacityAni.setEasingCurve(QEasingCurve.OutQuad)
 
-        self.ani.setStartValue(pos-QPoint(0, 8))
+        self.ani.setStartValue(pos - QPoint(0, 8))
         self.ani.setEndValue(pos)
         self.ani.setDuration(150)
         self.ani.setEasingCurve(QEasingCurve.OutQuad)
@@ -1065,11 +1134,11 @@ class FadeInDropDownMenuAnimationManager(MenuAnimationManager):
 
 @MenuAnimationManager.register(MenuAnimationType.FADE_IN_PULL_UP)
 class FadeInPullUpMenuAnimationManager(MenuAnimationManager):
-    """ Fade in pull up menu animation manager """
+    """Fade in pull up menu animation manager"""
 
     def __init__(self, menu: RoundMenu):
         super().__init__(menu)
-        self.opacityAni = QPropertyAnimation(menu, b'windowOpacity', self)
+        self.opacityAni = QPropertyAnimation(menu, b"windowOpacity", self)
         self.aniGroup = QParallelAnimationGroup(self)
         self.aniGroup.addAnimation(self.ani)
         self.aniGroup.addAnimation(self.opacityAni)
@@ -1090,7 +1159,7 @@ class FadeInPullUpMenuAnimationManager(MenuAnimationManager):
         self.opacityAni.setDuration(150)
         self.opacityAni.setEasingCurve(QEasingCurve.OutQuad)
 
-        self.ani.setStartValue(pos+QPoint(0, 8))
+        self.ani.setStartValue(pos + QPoint(0, 8))
         self.ani.setEndValue(pos)
         self.ani.setDuration(200)
         self.ani.setEasingCurve(QEasingCurve.OutQuad)
@@ -1098,11 +1167,11 @@ class FadeInPullUpMenuAnimationManager(MenuAnimationManager):
 
     def availableViewSize(self, pos: QPoint):
         ss = getCurrentScreenGeometry()
-        return ss.width() - 100, pos.y()- ss.top() - 28
+        return ss.width() - 100, pos.y() - ss.top() - 28
 
 
 class EditMenu(RoundMenu):
-    """ Edit menu """
+    """Edit menu"""
 
     def createActions(self):
         self.cutAct = QAction(
@@ -1137,11 +1206,14 @@ class EditMenu(RoundMenu):
             self.tr("Select all"),
             self,
             shortcut="Ctrl+A",
-            triggered=self.parent().selectAll
+            triggered=self.parent().selectAll,
         )
         self.action_list = [
-            self.cutAct, self.copyAct,
-            self.pasteAct, self.cancelAct, self.selectAllAct
+            self.cutAct,
+            self.copyAct,
+            self.pasteAct,
+            self.cancelAct,
+            self.selectAllAct,
         ]
 
     def _parentText(self):
@@ -1178,8 +1250,7 @@ class EditMenu(RoundMenu):
                 if self.parent().isReadOnly():
                     self.addActions([self.copyAct, self.selectAllAct])
                 else:
-                    self.addActions(
-                        self.action_list[:2] + self.action_list[3:])
+                    self.addActions(self.action_list[:2] + self.action_list[3:])
             else:
                 if self.parent().isReadOnly():
                     self.addAction(self.selectAllAct)
@@ -1190,7 +1261,7 @@ class EditMenu(RoundMenu):
 
 
 class LineEditMenu(EditMenu):
-    """ Line edit menu """
+    """Line edit menu"""
 
     def __init__(self, parent: QLineEdit):
         super().__init__("", parent)
@@ -1211,7 +1282,7 @@ class LineEditMenu(EditMenu):
 
 
 class TextEditMenu(EditMenu):
-    """ Text edit menu """
+    """Text edit menu"""
 
     def __init__(self, parent: QTextEdit):
         super().__init__("", parent)
@@ -1230,13 +1301,14 @@ class TextEditMenu(EditMenu):
             cursor = self.parent().textCursor()
             cursor.setPosition(self.selectionStart)
             cursor.movePosition(
-                QTextCursor.Right, QTextCursor.KeepAnchor, self.selectionLength)
+                QTextCursor.Right, QTextCursor.KeepAnchor, self.selectionLength
+            )
 
         super()._onItemClicked(item)
 
 
 class IndicatorMenuItemDelegate(MenuItemDelegate):
-    """ Menu item delegate with indicator """
+    """Menu item delegate with indicator"""
 
     def paint(self, painter: QPainter, option, index):
         super().paint(painter, option, index)
@@ -1245,22 +1317,29 @@ class IndicatorMenuItemDelegate(MenuItemDelegate):
 
         painter.save()
         painter.setRenderHints(
-            QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
+            QPainter.Antialiasing
+            | QPainter.SmoothPixmapTransform
+            | QPainter.TextAntialiasing
+        )
 
         painter.setPen(Qt.NoPen)
         painter.setBrush(themeColor())
-        painter.drawRoundedRect(6, 11+option.rect.y(), 3, 15, 1.5, 1.5)
+        painter.drawRoundedRect(6, 11 + option.rect.y(), 3, 15, 1.5, 1.5)
 
         painter.restore()
 
 
 class CheckableMenuItemDelegate(ShortcutMenuItemDelegate):
-    """ Checkable menu item delegate """
+    """Checkable menu item delegate"""
 
-    def _drawIndicator(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
+    def _drawIndicator(
+        self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         raise NotImplementedError
 
-    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
+    def paint(
+        self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
+    ):
         super().paint(painter, option, index)
 
         # draw indicator
@@ -1274,7 +1353,7 @@ class CheckableMenuItemDelegate(ShortcutMenuItemDelegate):
 
 
 class RadioIndicatorMenuItemDelegate(CheckableMenuItemDelegate):
-    """ Checkable menu item delegate with radio indicator """
+    """Checkable menu item delegate with radio indicator"""
 
     def _drawIndicator(self, painter, option, index):
         rect = option.rect
@@ -1292,7 +1371,7 @@ class RadioIndicatorMenuItemDelegate(CheckableMenuItemDelegate):
 
 
 class CheckIndicatorMenuItemDelegate(CheckableMenuItemDelegate):
-    """ Checkable menu item delegate with check indicator """
+    """Checkable menu item delegate with check indicator"""
 
     def _drawIndicator(self, painter, option, index):
         rect = option.rect
@@ -1308,28 +1387,29 @@ class CheckIndicatorMenuItemDelegate(CheckableMenuItemDelegate):
 
 
 class MenuIndicatorType(Enum):
-    """ Menu indicator type """
+    """Menu indicator type"""
+
     CHECK = 0
     RADIO = 1
 
 
 def createCheckableMenuItemDelegate(style: MenuIndicatorType):
-    """ create checkable menu item delegate """
+    """create checkable menu item delegate"""
     if style == MenuIndicatorType.RADIO:
         return RadioIndicatorMenuItemDelegate()
     if style == MenuIndicatorType.CHECK:
         return CheckIndicatorMenuItemDelegate()
 
-    raise ValueError(f'`{style}` is not a valid menu indicator type.')
+    raise ValueError(f"`{style}` is not a valid menu indicator type.")
 
 
 class CheckableMenu(RoundMenu):
-    """ Checkable menu """
+    """Checkable menu"""
 
     def __init__(self, title="", parent=None, indicatorType=MenuIndicatorType.CHECK):
         super().__init__(title, parent)
         self.view.setItemDelegate(createCheckableMenuItemDelegate(indicatorType))
-        self.view.setObjectName('checkableListWidget')
+        self.view.setObjectName("checkableListWidget")
 
     def _adjustItemText(self, item: QListWidgetItem, action: QAction):
         w = super()._adjustItemText(item, action)
@@ -1337,7 +1417,7 @@ class CheckableMenu(RoundMenu):
 
 
 class SystemTrayMenu(RoundMenu):
-    """ System tray menu """
+    """System tray menu"""
 
     def sizeHint(self) -> QSize:
         m = self.layout().contentsMargins()
@@ -1346,7 +1426,7 @@ class SystemTrayMenu(RoundMenu):
 
 
 class CheckableSystemTrayMenu(CheckableMenu):
-    """ Checkable system tray menu """
+    """Checkable system tray menu"""
 
     def sizeHint(self) -> QSize:
         m = self.layout().contentsMargins()
@@ -1355,7 +1435,7 @@ class CheckableSystemTrayMenu(CheckableMenu):
 
 
 class LabelContextMenu(RoundMenu):
-    """ Label context menu """
+    """Label context menu"""
 
     def __init__(self, parent: QLabel):
         super().__init__("", parent)
@@ -1366,13 +1446,10 @@ class LabelContextMenu(RoundMenu):
             self.tr("Copy"),
             self,
             shortcut="Ctrl+C",
-            triggered=self._onCopy
+            triggered=self._onCopy,
         )
         self.selectAllAct = QAction(
-            self.tr("Select all"),
-            self,
-            shortcut="Ctrl+A",
-            triggered=self._onSelectAll
+            self.tr("Select all"), self, shortcut="Ctrl+A", triggered=self._onSelectAll
         )
 
     def _onCopy(self):

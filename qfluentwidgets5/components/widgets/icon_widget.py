@@ -10,7 +10,7 @@ from ...common.overload import singledispatchmethod
 
 
 class IconWidget(QWidget):
-    """ Icon widget
+    """Icon widget
 
     Constructors
     ------------

@@ -1,8 +1,24 @@
 # coding:utf-8
 from typing import List, Union
-from PyQt5.QtCore import QEvent, Qt, QPropertyAnimation, pyqtProperty, QEasingCurve, QRectF
+from PyQt5.QtCore import (
+    QEvent,
+    Qt,
+    QPropertyAnimation,
+    pyqtProperty,
+    QEasingCurve,
+    QRectF,
+)
 from PyQt5.QtGui import QColor, QPainter, QIcon, QPainterPath
-from PyQt5.QtWidgets import QFrame, QWidget, QAbstractButton, QApplication, QScrollArea, QVBoxLayout, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import (
+    QFrame,
+    QWidget,
+    QAbstractButton,
+    QApplication,
+    QScrollArea,
+    QVBoxLayout,
+    QLabel,
+    QHBoxLayout,
+)
 
 from ...common.config import isDarkTheme
 from ...common.icon import FluentIcon as FIF
@@ -12,7 +28,7 @@ from ..layout.v_box_layout import VBoxLayout
 
 
 class ExpandButton(QAbstractButton):
-    """ Expand button """
+    """Expand button"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -20,13 +36,12 @@ class ExpandButton(QAbstractButton):
         self.__angle = 0
         self.isHover = False
         self.isPressed = False
-        self.rotateAni = QPropertyAnimation(self, b'angle', self)
+        self.rotateAni = QPropertyAnimation(self, b"angle", self)
         self.clicked.connect(self.__onClicked)
 
     def paintEvent(self, e):
         painter = QPainter(self)
-        painter.setRenderHints(QPainter.Antialiasing |
-                               QPainter.SmoothPixmapTransform)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
         painter.setPen(Qt.NoPen)
 
         # draw background
@@ -45,7 +60,7 @@ class ExpandButton(QAbstractButton):
         painter.drawRoundedRect(self.rect(), 4, 4)
 
         # draw icon
-        painter.translate(self.width()//2, self.height()//2)
+        painter.translate(self.width() // 2, self.height() // 2)
         painter.rotate(self.__angle)
         FIF.ARROW_DOWN.render(painter, QRectF(-5, -5, 9.6, 9.6))
 
@@ -91,7 +106,7 @@ class ExpandButton(QAbstractButton):
 
 
 class SpaceWidget(QWidget):
-    """ Spacing widget """
+    """Spacing widget"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -100,7 +115,7 @@ class SpaceWidget(QWidget):
 
 
 class HeaderSettingCard(SettingCard):
-    """ Header setting card """
+    """Header setting card"""
 
     def __init__(self, icon, title, content=None, parent=None):
         super().__init__(icon, title, content, parent)
@@ -127,7 +142,7 @@ class HeaderSettingCard(SettingCard):
         return super().eventFilter(obj, e)
 
     def addWidget(self, widget: QWidget):
-        """ add widget to tail """
+        """add widget to tail"""
         N = self.hBoxLayout.count()
         self.hBoxLayout.removeItem(self.hBoxLayout.itemAt(N - 1))
         self.hBoxLayout.addWidget(widget, 0, Qt.AlignRight)
@@ -151,14 +166,14 @@ class HeaderSettingCard(SettingCard):
         path.addRoundedRect(QRectF(self.rect().adjusted(1, 1, -1, -1)), 6, 6)
 
         # set the bottom border radius to 0 if parent is expanded
-        if hasattr(p, 'isExpand') and p.isExpand:
+        if hasattr(p, "isExpand") and p.isExpand:
             path.addRect(1, self.height() - 8, self.width() - 2, 8)
 
         painter.drawPath(path.simplified())
 
 
 class ExpandBorderWidget(QWidget):
-    """ Expand setting card border widget """
+    """Expand setting card border widget"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -193,11 +208,12 @@ class ExpandBorderWidget(QWidget):
             painter.drawLine(1, ch, w - 1, ch)
 
 
-
 class ExpandSettingCard(QScrollArea):
-    """ Expandable setting card """
+    """Expandable setting card"""
 
-    def __init__(self, icon: Union[str, QIcon, FIF], title: str, content: str = None, parent=None):
+    def __init__(
+        self, icon: Union[str, QIcon, FIF], title: str, content: str = None, parent=None
+    ):
         super().__init__(parent=parent)
         self.isExpand = False
 
@@ -211,12 +227,12 @@ class ExpandSettingCard(QScrollArea):
         self.borderWidget = ExpandBorderWidget(self)
 
         # expand animation
-        self.expandAni = QPropertyAnimation(self.verticalScrollBar(), b'value', self)
+        self.expandAni = QPropertyAnimation(self.verticalScrollBar(), b"value", self)
 
         self.__initWidget()
 
     def __initWidget(self):
-        """ initialize widgets """
+        """initialize widgets"""
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
         self.setFixedHeight(self.card.height())
@@ -235,9 +251,9 @@ class ExpandSettingCard(QScrollArea):
         self.expandAni.setDuration(200)
 
         # initialize style sheet
-        self.view.setObjectName('view')
-        self.scrollWidget.setObjectName('scrollWidget')
-        self.setProperty('isExpand', False)
+        self.view.setObjectName("view")
+        self.scrollWidget.setObjectName("scrollWidget")
+        self.setProperty("isExpand", False)
         FluentStyleSheet.EXPAND_SETTING_CARD.apply(self.card)
         FluentStyleSheet.EXPAND_SETTING_CARD.apply(self)
 
@@ -246,7 +262,7 @@ class ExpandSettingCard(QScrollArea):
         self.card.expandButton.clicked.connect(self.toggleExpand)
 
     def addWidget(self, widget: QWidget):
-        """ add widget to tail """
+        """add widget to tail"""
         self.card.addWidget(widget)
         self._adjustViewSize()
 
@@ -254,7 +270,7 @@ class ExpandSettingCard(QScrollArea):
         pass
 
     def setExpand(self, isExpand: bool):
-        """ set the expand status of card """
+        """set the expand status of card"""
         if self.isExpand == isExpand:
             return
 
@@ -262,7 +278,7 @@ class ExpandSettingCard(QScrollArea):
 
         # update style sheet
         self.isExpand = isExpand
-        self.setProperty('isExpand', isExpand)
+        self.setProperty("isExpand", isExpand)
         self.setStyle(QApplication.style())
 
         # start expand animation
@@ -279,7 +295,7 @@ class ExpandSettingCard(QScrollArea):
         self.card.expandButton.setExpand(isExpand)
 
     def toggleExpand(self):
-        """ toggle expand status """
+        """toggle expand status"""
         self.setExpand(not self.isExpand)
 
     def resizeEvent(self, e):
@@ -292,21 +308,20 @@ class ExpandSettingCard(QScrollArea):
         self.setFixedHeight(max(h + vh - self.verticalScrollBar().value(), h))
 
     def _adjustViewSize(self):
-        """ adjust view size """
+        """adjust view size"""
         h = self.viewLayout.sizeHint().height()
         self.spaceWidget.setFixedHeight(h)
 
         if self.isExpand:
-            self.setFixedHeight(self.card.height()+h)
+            self.setFixedHeight(self.card.height() + h)
 
     def setValue(self, value):
-        """ set the value of config item """
+        """set the value of config item"""
         pass
 
 
-
 class GroupSeparator(QWidget):
-    """ group separator """
+    """group separator"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -326,7 +341,15 @@ class GroupSeparator(QWidget):
 
 class GroupWidget(QWidget):
 
-    def __init__(self, icon: Union[str, QIcon, FIF], title: str, content: str, widget: QWidget, stretch=0, parent=None):
+    def __init__(
+        self,
+        icon: Union[str, QIcon, FIF],
+        title: str,
+        content: str,
+        widget: QWidget,
+        stretch=0,
+        parent=None,
+    ):
         super().__init__(parent=parent)
         self.iconWidget = SettingIconWidget(icon, self)
         self.titleLabel = QLabel(title, self)
@@ -359,8 +382,8 @@ class GroupWidget(QWidget):
         self.hBoxLayout.addStretch(1)
         self.hBoxLayout.addWidget(widget, stretch)
 
-        self.titleLabel.setObjectName('titleLabel')
-        self.contentLabel.setObjectName('contentLabel')
+        self.titleLabel.setObjectName("titleLabel")
+        self.contentLabel.setObjectName("contentLabel")
 
     def setTitle(self, title: str):
         self.titleLabel.setText(title)
@@ -370,7 +393,7 @@ class GroupWidget(QWidget):
         self.contentLabel.setVisible(bool(content))
 
     def setIconSize(self, width: int, height: int):
-        """ set the icon fixed size """
+        """set the icon fixed size"""
         self.iconWidget.setFixedSize(width, height)
 
     def setIcon(self, icon: Union[str, QIcon, FIF]):
@@ -378,19 +401,20 @@ class GroupWidget(QWidget):
         self.iconWidget.setHidden(self.iconWidget.icon.isNull())
 
 
-
 class ExpandGroupSettingCard(ExpandSettingCard):
-    """ Expand group setting card """
+    """Expand group setting card"""
 
-    def __init__(self, icon: Union[str, QIcon, FIF], title: str, content: str = None, parent=None):
+    def __init__(
+        self, icon: Union[str, QIcon, FIF], title: str, content: str = None, parent=None
+    ):
         super().__init__(icon, title, content, parent)
-        self.widgets = []   # type: List[QWidget]
+        self.widgets = []  # type: List[QWidget]
 
         self.viewLayout.setContentsMargins(0, 0, 0, 0)
         self.viewLayout.setSpacing(0)
 
     def addGroupWidget(self, widget: QWidget):
-        """ add widget to group """
+        """add widget to group"""
         # add separator
         if self.viewLayout.count() >= 1:
             self.viewLayout.addWidget(GroupSeparator(self.view))
@@ -400,8 +424,15 @@ class ExpandGroupSettingCard(ExpandSettingCard):
         self.viewLayout.addWidget(widget)
         self._adjustViewSize()
 
-    def addGroup(self, icon: Union[str, QIcon, FIF], title: str, content: str, widget: QWidget, stretch=0) -> GroupWidget:
-        """ add group
+    def addGroup(
+        self,
+        icon: Union[str, QIcon, FIF],
+        title: str,
+        content: str,
+        widget: QWidget,
+        stretch=0,
+    ) -> GroupWidget:
+        """add group
 
         Parameters
         ----------
@@ -425,7 +456,7 @@ class ExpandGroupSettingCard(ExpandSettingCard):
         return group
 
     def removeGroupWidget(self, widget: QWidget):
-        """ remove a group from card """
+        """remove a group from card"""
         if widget not in self.widgets:
             return
 
@@ -451,21 +482,21 @@ class ExpandGroupSettingCard(ExpandSettingCard):
         self._adjustViewSize()
 
     def _adjustViewSize(self):
-        """ adjust view size """
+        """adjust view size"""
         h = sum(w.sizeHint().height() + 3 for w in self.widgets)
         self.spaceWidget.setFixedHeight(h)
 
         if self.isExpand:
-            self.setFixedHeight(self.card.height()+h)
+            self.setFixedHeight(self.card.height() + h)
 
 
 class SimpleExpandGroupSettingCard(ExpandGroupSettingCard):
-    """ Simple expand group setting card """
+    """Simple expand group setting card"""
 
     def _adjustViewSize(self):
-        """ adjust view size """
+        """adjust view size"""
         h = self.viewLayout.sizeHint().height()
         self.spaceWidget.setFixedHeight(h)
 
         if self.isExpand:
-            self.setFixedHeight(self.card.height()+h)
+            self.setFixedHeight(self.card.height() + h)

@@ -5,7 +5,17 @@ import json
 
 from PyQt5.QtXml import QDomDocument
 from PyQt5.QtCore import QRectF, Qt, QFile, QObject, QRect
-from PyQt5.QtGui import QIcon, QIconEngine, QColor, QPixmap, QImage, QPainter, QFontDatabase, QFont, QPainterPath
+from PyQt5.QtGui import (
+    QIcon,
+    QIconEngine,
+    QColor,
+    QPixmap,
+    QImage,
+    QPainter,
+    QFontDatabase,
+    QFont,
+    QPainterPath,
+)
 from PyQt5.QtWidgets import QAction, qApp, QApplication
 from PyQt5.QtSvg import QSvgRenderer
 
@@ -14,7 +24,7 @@ from .overload import singledispatchmethod
 
 
 class FluentIconEngine(QIconEngine):
-    """ Fluent icon engine """
+    """Fluent icon engine"""
 
     def __init__(self, icon, reverse=False):
         """
@@ -72,7 +82,7 @@ class FluentIconEngine(QIconEngine):
 
 
 class SvgIconEngine(QIconEngine):
-    """ Svg icon engine """
+    """Svg icon engine"""
 
     def __init__(self, svg: str):
         super().__init__()
@@ -96,7 +106,7 @@ class SvgIconEngine(QIconEngine):
 
 
 class FontIconEngine(QIconEngine):
-    """ Font icon engine """
+    """Font icon engine"""
 
     def __init__(self, fontFamily: str, char: str, color, isBold):
         super().__init__()
@@ -113,12 +123,12 @@ class FontIconEngine(QIconEngine):
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(self.color)
         painter.setRenderHints(
-            QPainter.RenderHint.Antialiasing | QPainter.RenderHint.TextAntialiasing)
+            QPainter.RenderHint.Antialiasing | QPainter.RenderHint.TextAntialiasing
+        )
 
         path = QPainterPath()
         path.addText(rect.x(), rect.y() + rect.height(), font, self.char)
         painter.drawPath(path)
-
 
     def clone(self) -> QIconEngine:
         return FontIconEngine(self.fontFamily, self.char, self.color, self.isBold)
@@ -135,7 +145,7 @@ class FontIconEngine(QIconEngine):
 
 
 def getIconColor(theme=Theme.AUTO, reverse=False):
-    """ get the color of icon based on theme """
+    """get the color of icon based on theme"""
     if not reverse:
         lc, dc = "black", "white"
     else:
@@ -150,7 +160,7 @@ def getIconColor(theme=Theme.AUTO, reverse=False):
 
 
 def drawSvgIcon(icon, painter, rect):
-    """ draw svg icon
+    """draw svg icon
 
     Parameters
     ----------
@@ -168,7 +178,7 @@ def drawSvgIcon(icon, painter, rect):
 
 
 def writeSvg(iconPath: str, indexes=None, **attributes):
-    """ write svg with specified attributes
+    """write svg with specified attributes
 
     Parameters
     ----------
@@ -186,7 +196,7 @@ def writeSvg(iconPath: str, indexes=None, **attributes):
     svg: str
         svg code
     """
-    if not iconPath.lower().endswith('.svg'):
+    if not iconPath.lower().endswith(".svg"):
         return ""
 
     f = QFile(iconPath)
@@ -198,7 +208,7 @@ def writeSvg(iconPath: str, indexes=None, **attributes):
     f.close()
 
     # change the color of each path
-    pathNodes = dom.elementsByTagName('path')
+    pathNodes = dom.elementsByTagName("path")
     indexes = range(pathNodes.length()) if not indexes else indexes
     for i in indexes:
         element = pathNodes.at(i).toElement()
@@ -210,7 +220,7 @@ def writeSvg(iconPath: str, indexes=None, **attributes):
 
 
 def drawIcon(icon, painter, rect, state=QIcon.Off, **attributes):
-    """ draw icon
+    """draw icon
 
     Parameters
     ----------
@@ -236,10 +246,10 @@ def drawIcon(icon, painter, rect, state=QIcon.Off, **attributes):
 
 
 class FluentIconBase:
-    """ Fluent icon base class """
+    """Fluent icon base class"""
 
     def path(self, theme=Theme.AUTO) -> str:
-        """ get the path of icon
+        """get the path of icon
 
         Parameters
         ----------
@@ -252,7 +262,7 @@ class FluentIconBase:
         raise NotImplementedError
 
     def icon(self, theme=Theme.AUTO, color: QColor = None) -> QIcon:
-        """ create a fluent icon
+        """create a fluent icon
 
         Parameters
         ----------
@@ -267,14 +277,14 @@ class FluentIconBase:
         """
         path = self.path(theme)
 
-        if not (path.endswith('.svg') and color):
+        if not (path.endswith(".svg") and color):
             return QIcon(self.path(theme))
 
         color = QColor(color).name()
         return QIcon(SvgIconEngine(writeSvg(path, fill=color)))
 
     def colored(self, lightColor: QColor, darkColor: QColor) -> "ColoredFluentIcon":
-        """ create a colored fluent icon
+        """create a colored fluent icon
 
         Parameters
         ----------
@@ -287,7 +297,7 @@ class FluentIconBase:
         return ColoredFluentIcon(self, lightColor, darkColor)
 
     def qicon(self, reverse=False) -> QIcon:
-        """ convert to QIcon, the theme of icon will be updated synchronously with app
+        """convert to QIcon, the theme of icon will be updated synchronously with app
 
         Parameters
         ----------
@@ -297,7 +307,7 @@ class FluentIconBase:
         return QIcon(FluentIconEngine(self, reverse))
 
     def render(self, painter, rect, theme=Theme.AUTO, indexes=None, **attributes):
-        """ draw svg icon
+        """draw svg icon
 
         Parameters
         ----------
@@ -321,7 +331,7 @@ class FluentIconBase:
         """
         icon = self.path(theme)
 
-        if icon.endswith('.svg'):
+        if icon.endswith(".svg"):
             if attributes:
                 icon = writeSvg(icon, indexes, **attributes).encode()
 
@@ -333,7 +343,7 @@ class FluentIconBase:
 
 
 class FluentFontIconBase(FluentIconBase):
-    """ Fluent font icon base class """
+    """Fluent font icon base class"""
 
     _isFontLoaded = False
     fontId = None
@@ -369,7 +379,9 @@ class FluentFontIconBase(FluentIconBase):
         self.darkColor = QColor(darkColor)
         return self
 
-    def render(self, painter: QPainter, rect, theme=Theme.AUTO, indexes=None, **attributes):
+    def render(
+        self, painter: QPainter, rect, theme=Theme.AUTO, indexes=None, **attributes
+    ):
         color = self._getIconColor(theme)
 
         if "fill" in attributes:
@@ -381,7 +393,9 @@ class FluentFontIconBase(FluentIconBase):
         painter.setFont(font)
         painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(color)
-        painter.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.TextAntialiasing)
+        painter.setRenderHints(
+            QPainter.RenderHint.Antialiasing | QPainter.RenderHint.TextAntialiasing
+        )
 
         path = QPainterPath()
         path.addText(rect.x(), rect.y() + rect.height(), font, self.char)
@@ -391,7 +405,7 @@ class FluentFontIconBase(FluentIconBase):
         return None
 
     def loadFont(self):
-        """ Load icon font """
+        """Load icon font"""
         cls = self.__class__
         if cls._isFontLoaded or not QApplication.instance():
             return
@@ -410,7 +424,7 @@ class FluentFontIconBase(FluentIconBase):
             self.loadIconNames()
 
     def loadIconNames(self):
-        """ Load icon name map """
+        """Load icon name map"""
         cls = self.__class__
         cls._iconNames.clear()
 
@@ -418,7 +432,7 @@ class FluentFontIconBase(FluentIconBase):
         if not file.open(QFile.ReadOnly):
             raise FileNotFoundError(f"Cannot open font file: {self.iconNameMapPath()}")
 
-        cls._iconNames = json.loads(str(file.readAll(), encoding='utf-8'))
+        cls._iconNames = json.loads(str(file.readAll(), encoding="utf-8"))
         file.close()
 
     def _getIconColor(self, theme):
@@ -431,7 +445,7 @@ class FluentFontIconBase(FluentIconBase):
 
 
 class ColoredFluentIcon(FluentIconBase):
-    """ Colored fluent icon """
+    """Colored fluent icon"""
 
     def __init__(self, icon: FluentIconBase, lightColor, darkColor):
         """
@@ -457,7 +471,7 @@ class ColoredFluentIcon(FluentIconBase):
     def render(self, painter, rect, theme=Theme.AUTO, indexes=None, **attributes):
         icon = self.path(theme)
 
-        if not icon.endswith('.svg'):
+        if not icon.endswith(".svg"):
             return self.fluentIcon.render(painter, rect, theme, indexes, attributes)
 
         if theme == Theme.AUTO:
@@ -470,9 +484,8 @@ class ColoredFluentIcon(FluentIconBase):
         drawSvgIcon(icon, painter, rect)
 
 
-
 class FluentIcon(FluentIconBase, Enum):
-    """ Fluent icon """
+    """Fluent icon"""
 
     UP = "Up"
     ADD = "Add"
@@ -534,7 +547,7 @@ class FluentIcon(FluentIconBase, Enum):
     UNPIN = "Unpin"
     VIDEO = "Video"
     TRAIN = "Train"
-    ADD_TO  ="AddTo"
+    ADD_TO = "AddTo"
     ACCEPT = "Accept"
     CAMERA = "Camera"
     CANCEL = "Cancel"
@@ -554,10 +567,10 @@ class FluentIcon(FluentIconBase, Enum):
     ROTATE = "Rotate"
     SEARCH = "Search"
     VOLUME = "Volume"
-    FRIGID  = "Frigid"
+    FRIGID = "Frigid"
     SAVE_AS = "SaveAs"
     ZOOM_IN = "ZoomIn"
-    CONNECT  ="Connect"
+    CONNECT = "Connect"
     HISTORY = "History"
     SETTING = "Setting"
     PALETTE = "Palette"
@@ -616,7 +629,7 @@ class FluentIcon(FluentIconBase, Enum):
     MIX_VOLUMES = "MixVolumes"
     REMOVE_FROM = "RemoveFrom"
     RIGHT_ARROW = "RightArrow"
-    QUIET_HOURS  ="QuietHours"
+    QUIET_HOURS = "QuietHours"
     FINGERPRINT = "Fingerprint"
     APPLICATION = "Application"
     CERTIFICATE = "Certificate"
@@ -651,7 +664,7 @@ class FluentIcon(FluentIconBase, Enum):
     EXPRESSIVE_INPUT_ENTRY = "ExpressiveInputEntry"
 
     def path(self, theme=Theme.AUTO):
-        return f':/qfluentwidgets/images/icons/{self.value}_{getIconColor(theme)}.svg'
+        return f":/qfluentwidgets/images/icons/{self.value}_{getIconColor(theme)}.svg"
 
 
 class Icon(QIcon):
@@ -662,7 +675,7 @@ class Icon(QIcon):
 
 
 def toQIcon(icon: Union[QIcon, FluentIconBase, str]) -> QIcon:
-    """ convet `icon` to `QIcon` """
+    """convet `icon` to `QIcon`"""
     if isinstance(icon, str):
         return QIcon(icon)
 
@@ -673,7 +686,7 @@ def toQIcon(icon: Union[QIcon, FluentIconBase, str]) -> QIcon:
 
 
 class Action(QAction):
-    """ Fluent action
+    """Fluent action
 
     Constructors
     ------------

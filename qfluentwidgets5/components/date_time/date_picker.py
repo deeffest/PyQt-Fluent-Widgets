@@ -5,7 +5,7 @@ from .picker_base import PickerBase, PickerPanel, PickerColumnFormatter, DigitFo
 
 
 class DatePickerBase(PickerBase):
-    """ Date picker base class """
+    """Date picker base class"""
 
     dateChanged = pyqtSignal(QDate)
 
@@ -21,7 +21,7 @@ class DatePickerBase(PickerBase):
         return self._date
 
     def setDate(self, date: QDate):
-        """ set current date """
+        """set current date"""
         raise NotImplementedError
 
     def setYearFormatter(self, formatter: PickerColumnFormatter):
@@ -43,21 +43,29 @@ class DatePickerBase(PickerBase):
         return self._monthFormatter or MonthFormatter()
 
     def reset(self):
-        """ Reset date """
+        """Reset date"""
         self._date = QDate()
         super().reset()
 
 
 class MonthFormatter(PickerColumnFormatter):
-    """ Month formatter """
+    """Month formatter"""
 
     def __init__(self):
         super().__init__()
         self.months = [
-            self.tr('January'), self.tr('February'), self.tr('March'),
-            self.tr('April'), self.tr('May'), self.tr('June'),
-            self.tr('July'), self.tr('August'), self.tr('September'),
-            self.tr('October'), self.tr('November'), self.tr('December')
+            self.tr("January"),
+            self.tr("February"),
+            self.tr("March"),
+            self.tr("April"),
+            self.tr("May"),
+            self.tr("June"),
+            self.tr("July"),
+            self.tr("August"),
+            self.tr("September"),
+            self.tr("October"),
+            self.tr("November"),
+            self.tr("December"),
         ]
 
     def encode(self, month):
@@ -68,7 +76,7 @@ class MonthFormatter(PickerColumnFormatter):
 
 
 class DatePicker(DatePickerBase):
-    """ Date picker """
+    """Date picker"""
 
     MM_DD_YYYY = 0
     YYYY_MM_DD = 1
@@ -87,15 +95,15 @@ class DatePicker(DatePickerBase):
             is the month column tight
         """
         super().__init__(parent=parent)
-        self.MONTH = self.tr('month')
-        self.YEAR = self.tr('year')
-        self.DAY = self.tr('day')
+        self.MONTH = self.tr("month")
+        self.YEAR = self.tr("year")
+        self.DAY = self.tr("day")
 
         self.isMonthTight = isMonthTight
         self.setDateFormat(format)
 
     def setDateFormat(self, format: int):
-        """ set the format of date
+        """set the format of date
 
         Parameters
         ----------
@@ -111,23 +119,25 @@ class DatePicker(DatePickerBase):
             self.dayIndex = 1
             self.yearIndex = 2
 
-            self.addColumn(self.MONTH, range(1, 13),
-                           80, Qt.AlignLeft, self.monthFormatter())
-            self.addColumn(self.DAY, range(1, 32),
-                           80, formatter=self.dayFormatter())
-            self.addColumn(self.YEAR, range(y-100, y+101),
-                           80, formatter=self.yearFormatter())
+            self.addColumn(
+                self.MONTH, range(1, 13), 80, Qt.AlignLeft, self.monthFormatter()
+            )
+            self.addColumn(self.DAY, range(1, 32), 80, formatter=self.dayFormatter())
+            self.addColumn(
+                self.YEAR, range(y - 100, y + 101), 80, formatter=self.yearFormatter()
+            )
         elif format == self.YYYY_MM_DD:
             self.yearIndex = 0
             self.monthIndex = 1
             self.dayIndex = 2
 
-            self.addColumn(self.YEAR, range(y-100, y+101),
-                           80, formatter=self.yearFormatter())
-            self.addColumn(self.MONTH, range(1, 13),
-                           80, formatter=self.monthFormatter())
-            self.addColumn(self.DAY, range(1, 32), 80,
-                           formatter=self.dayFormatter())
+            self.addColumn(
+                self.YEAR, range(y - 100, y + 101), 80, formatter=self.yearFormatter()
+            )
+            self.addColumn(
+                self.MONTH, range(1, 13), 80, formatter=self.monthFormatter()
+            )
+            self.addColumn(self.DAY, range(1, 32), 80, formatter=self.dayFormatter())
 
         self.setColumnWidth(self.monthIndex, self._monthColumnWidth())
 
@@ -142,7 +152,7 @@ class DatePicker(DatePickerBase):
         return [y, m, d] if self.dateFormat == self.YYYY_MM_DD else [m, d, y]
 
     def setMonthTight(self, isTight: bool):
-        """ set whether the month column is tight """
+        """set whether the month column is tight"""
         if self.isMonthTight == isTight:
             return
 
@@ -151,11 +161,10 @@ class DatePicker(DatePickerBase):
 
     def _monthColumnWidth(self):
         fm = self.fontMetrics()
-        wm = max(fm.width(i)
-                 for i in self.columns[self.monthIndex].items()) + 20
+        wm = max(fm.width(i) for i in self.columns[self.monthIndex].items()) + 20
 
         # don't use tight layout for english
-        if self.MONTH == 'month':
+        if self.MONTH == "month":
             return wm + 49
 
         return max(80, wm) if self.isMonthTight else wm + 49
@@ -165,10 +174,8 @@ class DatePicker(DatePickerBase):
             return
 
         # get days number in month
-        month = self.decodeValue(
-            self.monthIndex, panel.columnValue(self.monthIndex))
-        year = self.decodeValue(
-            self.yearIndex, panel.columnValue(self.yearIndex))
+        month = self.decodeValue(self.monthIndex, panel.columnValue(self.monthIndex))
+        year = self.decodeValue(self.yearIndex, panel.columnValue(self.yearIndex))
         days = self.calendar.daysInMonth(month, year)
 
         # update days
@@ -207,7 +214,7 @@ class DatePicker(DatePickerBase):
 
 
 class ZhFormatter(PickerColumnFormatter):
-    """ Chinese date formatter """
+    """Chinese date formatter"""
 
     suffix = ""
 
@@ -219,25 +226,25 @@ class ZhFormatter(PickerColumnFormatter):
 
 
 class ZhYearFormatter(ZhFormatter):
-    """ Chinese year formatter """
+    """Chinese year formatter"""
 
     suffix = "年"
 
 
 class ZhMonthFormatter(ZhFormatter):
-    """ Chinese month formatter """
+    """Chinese month formatter"""
 
     suffix = "月"
 
 
 class ZhDayFormatter(ZhFormatter):
-    """ Chinese day formatter """
+    """Chinese day formatter"""
 
     suffix = "日"
 
 
 class ZhDatePicker(DatePicker):
-    """ Chinese date picker """
+    """Chinese date picker"""
 
     def __init__(self, parent=None):
         super().__init__(parent, DatePicker.YYYY_MM_DD)

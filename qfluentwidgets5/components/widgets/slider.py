@@ -1,17 +1,23 @@
 # coding:utf-8
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QPoint, QRectF, QPropertyAnimation, pyqtProperty
+from PyQt5.QtCore import (
+    QSize,
+    Qt,
+    pyqtSignal,
+    QPoint,
+    QRectF,
+    QPropertyAnimation,
+    pyqtProperty,
+)
 from PyQt5.QtGui import QColor, QMouseEvent, QPainter, QPainterPath
-from PyQt5.QtWidgets import (QProxyStyle, QSlider, QStyle, QStyleOptionSlider,
-                             QWidget)
+from PyQt5.QtWidgets import QProxyStyle, QSlider, QStyle, QStyleOptionSlider, QWidget
 
 from ...common.style_sheet import FluentStyleSheet, themeColor, isDarkTheme
 from ...common.color import autoFallbackThemeColor
 from ...common.overload import singledispatchmethod
 
 
-
 class SliderHandle(QWidget):
-    """ Slider handle """
+    """Slider handle"""
 
     pressed = pyqtSignal()
     released = pyqtSignal()
@@ -22,7 +28,7 @@ class SliderHandle(QWidget):
         self._radius = 5
         self.lightHandleColor = QColor()
         self.darkHandleColor = QColor()
-        self.radiusAni = QPropertyAnimation(self, b'radius', self)
+        self.radiusAni = QPropertyAnimation(self, b"radius", self)
         self.radiusAni.setDuration(100)
 
     @pyqtProperty(float)
@@ -71,13 +77,14 @@ class SliderHandle(QWidget):
         painter.drawEllipse(self.rect().adjusted(1, 1, -1, -1))
 
         # draw innert circle
-        painter.setBrush(autoFallbackThemeColor(self.lightHandleColor, self.darkHandleColor))
+        painter.setBrush(
+            autoFallbackThemeColor(self.lightHandleColor, self.darkHandleColor)
+        )
         painter.drawEllipse(QPoint(11, 11), self.radius, self.radius)
 
 
-
 class Slider(QSlider):
-    """ A slider can be clicked
+    """A slider can be clicked
 
     Constructors
     ------------
@@ -133,7 +140,11 @@ class Slider(QSlider):
 
     @property
     def grooveLength(self):
-        l = self.width() if self.orientation() == Qt.Orientation.Horizontal else self.height()
+        l = (
+            self.width()
+            if self.orientation() == Qt.Orientation.Horizontal
+            else self.height()
+        )
         return l - self.handle.width()
 
     def _adjustHandlePos(self):
@@ -155,7 +166,9 @@ class Slider(QSlider):
         painter = QPainter(self)
         painter.setRenderHints(QPainter.RenderHint.Antialiasing)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QColor(255, 255, 255, 115) if isDarkTheme() else QColor(0, 0, 0, 100))
+        painter.setBrush(
+            QColor(255, 255, 255, 115) if isDarkTheme() else QColor(0, 0, 0, 100)
+        )
 
         if self.orientation() == Qt.Orientation.Horizontal:
             self._drawHorizonGroove(painter)
@@ -172,32 +185,44 @@ class Slider(QSlider):
 
     def _drawHorizonGroove(self, painter: QPainter):
         w, r = self.width(), self.handle.width() / 2
-        painter.drawRoundedRect(QRectF(r, r-2, w-r*2, 4), 2, 2)
+        painter.drawRoundedRect(QRectF(r, r - 2, w - r * 2, 4), 2, 2)
 
         if self.maximum() - self.minimum() == 0:
             return
 
-        painter.setBrush(autoFallbackThemeColor(self.lightGrooveColor, self.darkGrooveColor))
-        aw = (self.value() - self.minimum()) / (self.maximum() - self.minimum()) * (w - r*2)
-        painter.drawRoundedRect(QRectF(r, r-2, aw, 4), 2, 2)
+        painter.setBrush(
+            autoFallbackThemeColor(self.lightGrooveColor, self.darkGrooveColor)
+        )
+        aw = (
+            (self.value() - self.minimum())
+            / (self.maximum() - self.minimum())
+            * (w - r * 2)
+        )
+        painter.drawRoundedRect(QRectF(r, r - 2, aw, 4), 2, 2)
 
     def _drawVerticalGroove(self, painter: QPainter):
         h, r = self.height(), self.handle.width() / 2
-        painter.drawRoundedRect(QRectF(r-2, r, 4, h-2*r), 2, 2)
+        painter.drawRoundedRect(QRectF(r - 2, r, 4, h - 2 * r), 2, 2)
 
         if self.maximum() - self.minimum() == 0:
             return
 
-        painter.setBrush(autoFallbackThemeColor(self.lightGrooveColor, self.darkGrooveColor))
-        ah = (self.value() - self.minimum()) / (self.maximum() - self.minimum()) * (h - r*2)
-        painter.drawRoundedRect(QRectF(r-2, r, 4, ah), 2, 2)
+        painter.setBrush(
+            autoFallbackThemeColor(self.lightGrooveColor, self.darkGrooveColor)
+        )
+        ah = (
+            (self.value() - self.minimum())
+            / (self.maximum() - self.minimum())
+            * (h - r * 2)
+        )
+        painter.drawRoundedRect(QRectF(r - 2, r, 4, ah), 2, 2)
 
     def resizeEvent(self, e):
         self._adjustHandlePos()
 
 
 class ClickableSlider(QSlider):
-    """ A slider can be clicked """
+    """A slider can be clicked"""
 
     clicked = pyqtSignal(int)
 
@@ -207,16 +232,14 @@ class ClickableSlider(QSlider):
         if self.orientation() == Qt.Horizontal:
             value = int(e.pos().x() / self.width() * self.maximum())
         else:
-            value = int((self.height()-e.pos().y()) /
-                        self.height() * self.maximum())
+            value = int((self.height() - e.pos().y()) / self.height() * self.maximum())
 
         self.setValue(value)
         self.clicked.emit(self.value())
 
 
-
 class HollowHandleStyle(QProxyStyle):
-    """ Hollow handle style """
+    """Hollow handle style"""
 
     def __init__(self, config: dict = None):
         """
@@ -233,40 +256,60 @@ class HollowHandleStyle(QProxyStyle):
             "handle.color": QColor(255, 255, 255),
             "handle.ring-width": 4,
             "handle.hollow-radius": 6,
-            "handle.margin": 4
+            "handle.margin": 4,
         }
         config = config if config else {}
         self.config.update(config)
 
         # get handle size
-        w = self.config["handle.margin"]+self.config["handle.ring-width"] + \
-            self.config["handle.hollow-radius"]
-        self.config["handle.size"] = QSize(2*w, 2*w)
+        w = (
+            self.config["handle.margin"]
+            + self.config["handle.ring-width"]
+            + self.config["handle.hollow-radius"]
+        )
+        self.config["handle.size"] = QSize(2 * w, 2 * w)
 
-    def subControlRect(self, cc: QStyle.ComplexControl, opt: QStyleOptionSlider, sc: QStyle.SubControl, widget: QWidget):
-        """ get the rectangular area occupied by the sub control """
-        if cc != self.CC_Slider or opt.orientation != Qt.Horizontal or sc == self.SC_SliderTickmarks:
+    def subControlRect(
+        self,
+        cc: QStyle.ComplexControl,
+        opt: QStyleOptionSlider,
+        sc: QStyle.SubControl,
+        widget: QWidget,
+    ):
+        """get the rectangular area occupied by the sub control"""
+        if (
+            cc != self.CC_Slider
+            or opt.orientation != Qt.Horizontal
+            or sc == self.SC_SliderTickmarks
+        ):
             return super().subControlRect(cc, opt, sc, widget)
 
         rect = opt.rect
 
         if sc == self.SC_SliderGroove:
             h = self.config["groove.height"]
-            grooveRect = QRectF(0, (rect.height()-h)//2, rect.width(), h)
+            grooveRect = QRectF(0, (rect.height() - h) // 2, rect.width(), h)
             return grooveRect.toRect()
 
         elif sc == self.SC_SliderHandle:
             size = self.config["handle.size"]
             x = self.sliderPositionFromValue(
-                opt.minimum, opt.maximum, opt.sliderPosition, rect.width())
+                opt.minimum, opt.maximum, opt.sliderPosition, rect.width()
+            )
 
             # solve the situation that the handle runs out of slider
-            x *= (rect.width()-size.width())/rect.width()
+            x *= (rect.width() - size.width()) / rect.width()
             sliderRect = QRectF(x, 0, size.width(), size.height())
             return sliderRect.toRect()
 
-    def drawComplexControl(self, cc: QStyle.ComplexControl, opt: QStyleOptionSlider, painter: QPainter, widget: QWidget):
-        """ draw sub control """
+    def drawComplexControl(
+        self,
+        cc: QStyle.ComplexControl,
+        opt: QStyleOptionSlider,
+        painter: QPainter,
+        widget: QWidget,
+    ):
+        """draw sub control"""
         if cc != self.CC_Slider or opt.orientation != Qt.Horizontal:
             return super().drawComplexControl(cc, opt, painter, widget)
 
@@ -280,15 +323,15 @@ class HollowHandleStyle(QProxyStyle):
         painter.translate(grooveRect.topLeft())
 
         # paint the crossed part
-        w = handleRect.x()-grooveRect.x()
-        h = self.config['groove.height']
+        w = handleRect.x() - grooveRect.x()
+        h = self.config["groove.height"]
         painter.setBrush(self.config["sub-page.color"])
         painter.drawRect(0, 0, w, h)
 
         # paint the uncrossed part
-        x = w+self.config['handle.size'].width()
+        x = w + self.config["handle.size"].width()
         painter.setBrush(self.config["add-page.color"])
-        painter.drawRect(x, 0, grooveRect.width()-w, h)
+        painter.drawRect(x, 0, grooveRect.width() - w, h)
         painter.restore()
 
         # paint handle
@@ -302,9 +345,10 @@ class HollowHandleStyle(QProxyStyle):
         path.addEllipse(center, radius, radius)
         path.addEllipse(center, hollowRadius, hollowRadius)
 
-        handleColor = self.config["handle.color"]  # type:QColor
-        handleColor.setAlpha(255 if opt.activeSubControls !=
-                             self.SC_SliderHandle else 153)
+        handleColor = self.config["handle.color"]  # type: QColor
+        handleColor.setAlpha(
+            255 if opt.activeSubControls != self.SC_SliderHandle else 153
+        )
         painter.setBrush(handleColor)
         painter.drawPath(path)
 

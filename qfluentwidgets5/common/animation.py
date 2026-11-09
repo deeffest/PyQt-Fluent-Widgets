@@ -1,6 +1,20 @@
 # coding: utf-8
 from enum import Enum
-from PyQt5.QtCore import QEasingCurve, QEvent, QObject, QPropertyAnimation, pyqtProperty, pyqtSignal, QPoint, QPointF, QRect, QRectF, QParallelAnimationGroup, QSequentialAnimationGroup, Qt
+from PyQt5.QtCore import (
+    QEasingCurve,
+    QEvent,
+    QObject,
+    QPropertyAnimation,
+    pyqtProperty,
+    pyqtSignal,
+    QPoint,
+    QPointF,
+    QRect,
+    QRectF,
+    QParallelAnimationGroup,
+    QSequentialAnimationGroup,
+    Qt,
+)
 from PyQt5.QtGui import QMouseEvent, QEnterEvent, QColor
 from PyQt5.QtWidgets import QWidget, QLineEdit, QGraphicsDropShadowEffect
 
@@ -8,7 +22,7 @@ from .config import qconfig
 
 
 class AnimationBase(QObject):
-    """ Animation base class """
+    """Animation base class"""
 
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
@@ -48,7 +62,7 @@ class TranslateYAnimation(AnimationBase):
         super().__init__(parent)
         self._y = 0
         self.maxOffset = offset
-        self.ani = QPropertyAnimation(self, b'y', self)
+        self.ani = QPropertyAnimation(self, b"y", self)
 
     @pyqtProperty(float)
     def y(self):
@@ -61,14 +75,14 @@ class TranslateYAnimation(AnimationBase):
         self.valueChanged.emit(y)
 
     def _onPress(self, e):
-        """ arrow down """
+        """arrow down"""
         self.ani.setEndValue(self.maxOffset)
         self.ani.setEasingCurve(QEasingCurve.OutQuad)
         self.ani.setDuration(150)
         self.ani.start()
 
     def _onRelease(self, e):
-        """ arrow up """
+        """arrow up"""
         self.ani.setEndValue(0)
         self.ani.setDuration(500)
         self.ani.setEasingCurve(QEasingCurve.OutElastic)
@@ -76,7 +90,7 @@ class TranslateYAnimation(AnimationBase):
 
 
 class BackgroundAnimationWidget:
-    """ Background animation widget """
+    """Background animation widget"""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -84,7 +98,8 @@ class BackgroundAnimationWidget:
         self.isPressed = False
         self.bgColorObject = BackgroundColorObject(self)
         self.backgroundColorAni = QPropertyAnimation(
-            self.bgColorObject, b'backgroundColor', self)
+            self.bgColorObject, b"backgroundColor", self
+        )
         self.backgroundColorAni.setDuration(120)
         self.installEventFilter(self)
 
@@ -165,7 +180,7 @@ class BackgroundAnimationWidget:
 
 
 class BackgroundColorObject(QObject):
-    """ Background color object """
+    """Background color object"""
 
     def __init__(self, parent: BackgroundAnimationWidget):
         super().__init__(parent)
@@ -182,9 +197,14 @@ class BackgroundColorObject(QObject):
 
 
 class DropShadowAnimation(QPropertyAnimation):
-    """ Drop shadow animation """
+    """Drop shadow animation"""
 
-    def __init__(self, parent: QWidget, normalColor=QColor(0, 0, 0, 0), hoverColor=QColor(0, 0, 0, 75)):
+    def __init__(
+        self,
+        parent: QWidget,
+        normalColor=QColor(0, 0, 0, 0),
+        hoverColor=QColor(0, 0, 0, 75),
+    ):
         super().__init__(parent=parent)
         self.normalColor = normalColor
         self.hoverColor = hoverColor
@@ -220,7 +240,7 @@ class DropShadowAnimation(QPropertyAnimation):
 
         self.setTargetObject(self.shadowEffect)
         self.setStartValue(self.shadowEffect.color())
-        self.setPropertyName(b'color')
+        self.setPropertyName(b"color")
         self.setDuration(150)
 
         return self.shadowEffect
@@ -251,14 +271,16 @@ class DropShadowAnimation(QPropertyAnimation):
 
 
 class FluentAnimationSpeed(Enum):
-    """ Fluent animation speed """
+    """Fluent animation speed"""
+
     FAST = 0
     MEDIUM = 1
     SLOW = 2
 
 
 class FluentAnimationType(Enum):
-    """ Fluent animation type """
+    """Fluent animation type"""
+
     FAST_INVOKE = 0
     STRONG_INVOKE = 1
     FAST_DISMISS = 2
@@ -268,16 +290,16 @@ class FluentAnimationType(Enum):
 
 
 class FluentAnimationProperty(Enum):
-    """ Fluent animation property """
+    """Fluent animation property"""
+
     POSITION = "position"
     SCALE = "scale"
     ANGLE = "angle"
     OPACITY = "opacity"
 
 
-
 class FluentAnimationProperObject(QObject):
-    """ Fluent animation property object """
+    """Fluent animation property object"""
 
     objects = {}
 
@@ -292,13 +314,14 @@ class FluentAnimationProperObject(QObject):
 
     @classmethod
     def register(cls, name):
-        """ register menu animation manager
+        """register menu animation manager
 
         Parameters
         ----------
         name: Any
             the name of manager, it should be unique
         """
+
         def wrapper(Manager):
             if name not in cls.objects:
                 cls.objects[name] = Manager
@@ -308,7 +331,9 @@ class FluentAnimationProperObject(QObject):
         return wrapper
 
     @classmethod
-    def create(cls, propertyType: FluentAnimationProperty, parent=None) -> 'FluentAnimationProperObject':
+    def create(
+        cls, propertyType: FluentAnimationProperty, parent=None
+    ) -> "FluentAnimationProperObject":
         if propertyType not in cls.objects:
             raise ValueError(f"`{propertyType}` has not been registered")
 
@@ -317,7 +342,7 @@ class FluentAnimationProperObject(QObject):
 
 @FluentAnimationProperObject.register(FluentAnimationProperty.POSITION)
 class PositionObject(FluentAnimationProperObject):
-    """ Position object """
+    """Position object"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -335,7 +360,7 @@ class PositionObject(FluentAnimationProperObject):
 
 @FluentAnimationProperObject.register(FluentAnimationProperty.SCALE)
 class ScaleObject(FluentAnimationProperObject):
-    """ Scale object """
+    """Scale object"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -353,7 +378,7 @@ class ScaleObject(FluentAnimationProperObject):
 
 @FluentAnimationProperObject.register(FluentAnimationProperty.ANGLE)
 class AngleObject(FluentAnimationProperObject):
-    """ Angle object """
+    """Angle object"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -371,7 +396,7 @@ class AngleObject(FluentAnimationProperObject):
 
 @FluentAnimationProperObject.register(FluentAnimationProperty.OPACITY)
 class OpacityObject(FluentAnimationProperObject):
-    """ Opacity object """
+    """Opacity object"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -388,7 +413,7 @@ class OpacityObject(FluentAnimationProperObject):
 
 
 class FluentAnimation(QPropertyAnimation):
-    """ Fluent animation base """
+    """Fluent animation base"""
 
     animations = {}
 
@@ -408,7 +433,7 @@ class FluentAnimation(QPropertyAnimation):
         return cls.createBezierCurve(0, 0, 1, 1)
 
     def setSpeed(self, speed: FluentAnimationSpeed):
-        """ set the speed of animation """
+        """set the speed of animation"""
         self.setDuration(self.speedToDuration(speed))
 
     def speedToDuration(self, speed: FluentAnimationSpeed):
@@ -433,13 +458,14 @@ class FluentAnimation(QPropertyAnimation):
 
     @classmethod
     def register(cls, name):
-        """ register menu animation manager
+        """register menu animation manager
 
         Parameters
         ----------
         name: Any
             the name of manager, it should be unique
         """
+
         def wrapper(Manager):
             if name not in cls.animations:
                 cls.animations[name] = Manager
@@ -449,8 +475,14 @@ class FluentAnimation(QPropertyAnimation):
         return wrapper
 
     @classmethod
-    def create(cls, aniType: FluentAnimationType, propertyType: FluentAnimationProperty,
-               speed=FluentAnimationSpeed.FAST, value=None, parent=None) -> "FluentAnimation":
+    def create(
+        cls,
+        aniType: FluentAnimationType,
+        propertyType: FluentAnimationProperty,
+        speed=FluentAnimationSpeed.FAST,
+        value=None,
+        parent=None,
+    ) -> "FluentAnimation":
         if aniType not in cls.animations:
             raise ValueError(f"`{aniType}` has not been registered.")
 
@@ -469,7 +501,7 @@ class FluentAnimation(QPropertyAnimation):
 
 @FluentAnimation.register(FluentAnimationType.FAST_INVOKE)
 class FastInvokeAnimation(FluentAnimation):
-    """ Fast invoke animation """
+    """Fast invoke animation"""
 
     @classmethod
     def curve(cls):
@@ -486,7 +518,7 @@ class FastInvokeAnimation(FluentAnimation):
 
 @FluentAnimation.register(FluentAnimationType.STRONG_INVOKE)
 class StrongInvokeAnimation(FluentAnimation):
-    """ Strong invoke animation """
+    """Strong invoke animation"""
 
     @classmethod
     def curve(cls):
@@ -498,12 +530,12 @@ class StrongInvokeAnimation(FluentAnimation):
 
 @FluentAnimation.register(FluentAnimationType.FAST_DISMISS)
 class FastDismissAnimation(FastInvokeAnimation):
-    """ Fast dismiss animation """
+    """Fast dismiss animation"""
 
 
 @FluentAnimation.register(FluentAnimationType.SOFT_DISMISS)
 class SoftDismissAnimation(FluentAnimation):
-    """ Soft dismiss animation """
+    """Soft dismiss animation"""
 
     @classmethod
     def curve(cls):
@@ -515,7 +547,7 @@ class SoftDismissAnimation(FluentAnimation):
 
 @FluentAnimation.register(FluentAnimationType.POINT_TO_POINT)
 class PointToPointAnimation(FastDismissAnimation):
-    """ Point to point animation """
+    """Point to point animation"""
 
     @classmethod
     def curve(cls):
@@ -524,22 +556,23 @@ class PointToPointAnimation(FastDismissAnimation):
 
 @FluentAnimation.register(FluentAnimationType.FADE_IN_OUT)
 class FadeInOutAnimation(FluentAnimation):
-    """ Fade in/out animation """
+    """Fade in/out animation"""
 
     def speedToDuration(self, speed: FluentAnimationSpeed):
         return 83
 
 
-
 class ScaleSlideAnimation(QParallelAnimationGroup):
-    """ Scale and slide animation """
+    """Scale and slide animation"""
 
     valueChanged = pyqtSignal(QRectF)
 
     def __init__(self, parent=None, orient=Qt.Orientation.Horizontal):
         super().__init__(parent)
         self.orient = orient
-        self._geometry = QRectF(0, 0, 16, 3) if self.isHorizontal() else QRectF(0, 0, 3, 16)
+        self._geometry = (
+            QRectF(0, 0, 16, 3) if self.isHorizontal() else QRectF(0, 0, 3, 16)
+        )
 
     def startAnimation(self, endRect: QRectF, useCrossFade=False):
         self.stopAnimation()
@@ -568,7 +601,7 @@ class ScaleSlideAnimation(QParallelAnimationGroup):
         self.clear()
 
     def _startSlideAnimation(self, startRect, endRect, from_, to, dimension):
-        """ Animate the indicator using WinUI 3 squash and stretch logic
+        """Animate the indicator using WinUI 3 squash and stretch logic
 
         Key algorithm:
         1. middleScale = abs(to - from) / dimension + (from < to ? endScale : beginScale)
@@ -638,16 +671,28 @@ class ScaleSlideAnimation(QParallelAnimationGroup):
 
         # Determine growth direction based on relative position
         # WinUI 3 logic: Grow from top/bottom edge depending on direction
-        isNextBelow = endRect.y() > startRect.y() if not self.isHorizontal() else endRect.x() > startRect.x()
+        isNextBelow = (
+            endRect.y() > startRect.y()
+            if not self.isHorizontal()
+            else endRect.x() > startRect.x()
+        )
 
         if self.isHorizontal():
             dim = endRect.width()
             startGeo = QRectF(
-                endRect.x() + (0 if isNextBelow else dim), endRect.y(), 0, endRect.height())
+                endRect.x() + (0 if isNextBelow else dim),
+                endRect.y(),
+                0,
+                endRect.height(),
+            )
         else:
             dim = endRect.height()
-            startGeo = QRectF(endRect.x(), endRect.y() +
-                              (0 if isNextBelow else dim), endRect.width(), 0)
+            startGeo = QRectF(
+                endRect.x(),
+                endRect.y() + (0 if isNextBelow else dim),
+                endRect.width(),
+                0,
+            )
 
         self.setGeometry(startGeo)
 
