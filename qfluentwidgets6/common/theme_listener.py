@@ -7,7 +7,7 @@ import sys
 
 
 class SystemThemeListener(QThread):
-    """ System theme listener """
+    """System theme listener"""
 
     systemThemeChanged = Signal()
 
@@ -24,7 +24,7 @@ class SystemThemeListener(QThread):
             theme = Theme.DARK if t == "dark" else Theme.LIGHT
             if theme != qconfig.theme:
                 self._onThemeChanged(t)
-                self.msleep(2000)   # anti shake
+                self.msleep(2000)  # anti shake
             else:
                 self.msleep(1000)
 

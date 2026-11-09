@@ -8,10 +8,11 @@ from .config import isDarkThemeMode
 
 
 class FluentThemeColor(Enum):
-    """ Fluent theme color
+    """Fluent theme color
 
     Refer to: https://www.figma.com/file/iM7EPX8Jn37zjeSezb43cF
     """
+
     YELLOW_GOLD = "#FFB900"
     GOLD = "#FF8C00"
     ORANGE_BRIGHT = "#F7630C"
@@ -65,7 +66,6 @@ class FluentThemeColor(Enum):
         return QColor(self.value)
 
 
-
 class FluentSystemColor(Enum):
 
     SUCCESS_FOREGROUND = ("#0f7b0f", "#6ccb5f")
@@ -79,7 +79,6 @@ class FluentSystemColor(Enum):
     def color(self, theme=Theme.AUTO) -> QColor:
         color = self.value[1] if isDarkThemeMode(theme) else self.value[0]
         return QColor(color)
-
 
 
 def validColor(color: QColor, default: QColor) -> QColor:

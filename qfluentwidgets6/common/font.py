@@ -7,7 +7,7 @@ from .config import qconfig
 
 
 def setFontFamilies(families: List[str], save=False):
-    """ set the font families used by all widgets
+    """set the font families used by all widgets
 
     Parameters
     ----------
@@ -21,12 +21,12 @@ def setFontFamilies(families: List[str], save=False):
 
 
 def fontFamilies() -> List[str]:
-    """ Returns the font families used by all widgets """
+    """Returns the font families used by all widgets"""
     return qconfig.get(qconfig.fontFamilies).copy()
 
 
 def setFont(widget: QWidget, fontSize=14, weight=QFont.Normal):
-    """ set the font of widget
+    """set the font of widget
 
     Parameters
     ----------
@@ -43,7 +43,7 @@ def setFont(widget: QWidget, fontSize=14, weight=QFont.Normal):
 
 
 def getFont(fontSize=14, weight=QFont.Normal):
-    """ create font
+    """create font
 
     Parameters
     ----------
@@ -61,7 +61,7 @@ def getFont(fontSize=14, weight=QFont.Normal):
 
 
 def fontStyleSheet(font: QFont):
-    """ Returns the style sheet of font """
+    """Returns the style sheet of font"""
     families = []
     for family in font.families():
         families.append(f"'{family}'")

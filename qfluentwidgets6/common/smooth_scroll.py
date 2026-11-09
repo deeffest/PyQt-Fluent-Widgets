@@ -3,15 +3,25 @@ from collections import deque
 from enum import Enum
 from math import cos, pi, ceil
 
-from PySide6.QtCore import QDateTime, Qt, QTimer, QPoint, QObject, QElapsedTimer, QPointF
+from PySide6.QtCore import (
+    QDateTime,
+    Qt,
+    QTimer,
+    QPoint,
+    QObject,
+    QElapsedTimer,
+    QPointF,
+)
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication, QScrollArea, QAbstractScrollArea
 
 
 class SmoothScroll:
-    """ Scroll smoothly """
+    """Scroll smoothly"""
 
-    def __init__(self, widget: QScrollArea, orient=Qt.Vertical, dynamicEngineEnabled=True):
+    def __init__(
+        self, widget: QScrollArea, orient=Qt.Vertical, dynamicEngineEnabled=True
+    ):
         """
         Parameters
         ----------
@@ -35,11 +45,11 @@ class SmoothScroll:
         self.adaptiveScrollEngine = AdaptiveSmoothScrollEngine(widget, orient)
 
     def setDynamicEngineEnabled(self, isEnabled: bool):
-        """ set whether to use dynamic engine """
+        """set whether to use dynamic engine"""
         self.dynamicEngineEnabled = isEnabled
 
     def setSmoothMode(self, smoothMode):
-        """ set smooth mode """
+        """set smooth mode"""
         self.smoothMode = smoothMode
         self.fixedStepScrollEngine.setSmoothMode(smoothMode)
         self.adaptiveScrollEngine.setSmoothMode(smoothMode)
@@ -55,16 +65,21 @@ class SmoothScroll:
         engine.wheelEvent(e, delta)
 
     def _chooseScrollEngine(self) -> "SmoothScrollEngineBase":
-        """ choose scroll engine """
+        """choose scroll engine"""
         # ellapse time driven adaptive scroll engine for HiDPI screen
-        if self.dynamicEngineEnabled and self.widget.width()*self.widget.devicePixelRatioF() > self.widthThreshold:
+        if (
+            self.dynamicEngineEnabled
+            and self.widget.width() * self.widget.devicePixelRatioF()
+            > self.widthThreshold
+        ):
             return self.adaptiveScrollEngine
 
         return self.fixedStepScrollEngine
 
 
 class SmoothMode(Enum):
-    """ Smooth mode """
+    """Smooth mode"""
+
     NO_SMOOTH = 0
     CONSTANT = 1
     LINEAR = 2
@@ -93,7 +108,7 @@ class SmoothScrollEngineBase(QObject):
         self.smoothMoveTimer.timeout.connect(self._smoothMove)
 
     def setSmoothMode(self, smoothMode):
-        """ set smooth mode """
+        """set smooth mode"""
         self.smoothMode = smoothMode
 
     def wheelEvent(self, e: QWheelEvent, delta: int):
@@ -139,7 +154,7 @@ class SmoothScrollEngineBase(QObject):
 
 
 class FixedStepSmoothScrollEngine(SmoothScrollEngineBase):
-    """ Scroll smoothly (fixed step) """
+    """Scroll smoothly (fixed step)"""
 
     def wheelEvent(self, e: QWheelEvent, delta: int):
         # push current time to queque
@@ -168,7 +183,7 @@ class FixedStepSmoothScrollEngine(SmoothScrollEngineBase):
         self.smoothMoveTimer.start(int(1000 / self.fps))
 
     def _getTotalDelta(self):
-        """ scroll smoothly when timer time out """
+        """scroll smoothly when timer time out"""
         totalDelta = 0
 
         # Calculate the scrolling distance of all unprocessed events,
@@ -184,7 +199,7 @@ class FixedStepSmoothScrollEngine(SmoothScrollEngineBase):
         return totalDelta
 
     def _subDelta(self, delta, stepsLeft):
-        """ get the interpolation for each step """
+        """get the interpolation for each step"""
         m = self.stepsTotal / 2
         x = abs(self.stepsTotal - stepsLeft - m)
 
@@ -204,7 +219,7 @@ class FixedStepSmoothScrollEngine(SmoothScrollEngineBase):
 
 
 class AdaptiveSmoothScrollEngine(SmoothScrollEngineBase):
-    """ Scroll smoothly (time-based, adaptive, HiDPI friendly) """
+    """Scroll smoothly (time-based, adaptive, HiDPI friendly)"""
 
     def __init__(self, widget: QScrollArea, orient=Qt.Vertical):
         super().__init__(widget, orient)
@@ -213,7 +228,7 @@ class AdaptiveSmoothScrollEngine(SmoothScrollEngineBase):
         self.minDuration = 120
 
     def setSmoothMode(self, smoothMode):
-        """ set smooth mode """
+        """set smooth mode"""
         self.smoothMode = smoothMode
 
     def wheelEvent(self, e, delta: int):
@@ -280,7 +295,7 @@ class AdaptiveSmoothScrollEngine(SmoothScrollEngineBase):
         return totalDelta
 
     def _subDelta(self, delta, ratio):
-        """ Calculate interpolated delta for current frame """
+        """Calculate interpolated delta for current frame"""
         if self.smoothMode == SmoothMode.CONSTANT:
             return delta * ratio
         if self.smoothMode == SmoothMode.LINEAR:

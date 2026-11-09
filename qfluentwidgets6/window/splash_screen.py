@@ -12,11 +12,16 @@ from ..components.widgets import IconWidget
 from qframelesswindow6 import TitleBar
 
 
-
 class SplashScreen(QWidget):
-    """ Splash screen """
+    """Splash screen"""
 
-    def __init__(self, icon: Union[str, QIcon, FluentIconBase], parent=None, enableShadow=True, enableTitleBar=True):
+    def __init__(
+        self,
+        icon: Union[str, QIcon, FluentIconBase],
+        parent=None,
+        enableShadow=True,
+        enableTitleBar=True,
+    ):
         super().__init__(parent=parent)
         self._icon = icon
         self._iconSize = QSize(96, 96)
@@ -59,7 +64,7 @@ class SplashScreen(QWidget):
         return self._iconSize
 
     def setTitleBar(self, titleBar: QWidget):
-        """ set title bar """
+        """set title bar"""
         if self.titleBar:
             self.titleBar.deleteLater()
         self.titleBar = titleBar
@@ -78,12 +83,12 @@ class SplashScreen(QWidget):
 
     def resizeEvent(self, e):
         iw, ih = self.iconSize().width(), self.iconSize().height()
-        self.iconWidget.move(self.width()//2 - iw//2, self.height()//2 - ih//2)
+        self.iconWidget.move(self.width() // 2 - iw // 2, self.height() // 2 - ih // 2)
         if self.titleBar:
             self.titleBar.resize(self.width(), self.titleBar.height())
 
     def finish(self):
-        """ close splash screen """
+        """close splash screen"""
         self.close()
 
     def paintEvent(self, e):

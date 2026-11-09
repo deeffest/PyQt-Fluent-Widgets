@@ -1,10 +1,28 @@
 # coding:utf-8
 from typing import Iterable, List
 
-from PySide6.QtCore import Qt, Signal, QSize, QRectF, QPoint, QPropertyAnimation, QEasingCurve, QObject
+from PySide6.QtCore import (
+    Qt,
+    Signal,
+    QSize,
+    QRectF,
+    QPoint,
+    QPropertyAnimation,
+    QEasingCurve,
+    QObject,
+)
 from PySide6.QtGui import QColor, QPainter, QCursor, QRegion
-from PySide6.QtWidgets import (QApplication, QWidget, QFrame, QVBoxLayout, QHBoxLayout,
-                             QGraphicsDropShadowEffect, QSizePolicy, QPushButton, QListWidgetItem)
+from PySide6.QtWidgets import (
+    QApplication,
+    QWidget,
+    QFrame,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGraphicsDropShadowEffect,
+    QSizePolicy,
+    QPushButton,
+    QListWidgetItem,
+)
 
 from ..widgets.cycle_list_widget import CycleListWidget
 from ..widgets.button import TransparentToolButton
@@ -15,7 +33,7 @@ from ...common.color import autoFallbackThemeColor
 
 
 class SeparatorWidget(QWidget):
-    """ Separator widget """
+    """Separator widget"""
 
     def __init__(self, orient: Qt.Orientation, parent=None):
         super().__init__(parent=parent)
@@ -29,7 +47,7 @@ class SeparatorWidget(QWidget):
 
 
 class ItemMaskWidget(QWidget):
-    """ Item mask widget """
+    """Item mask widget"""
 
     def __init__(self, listWidgets: List[CycleListWidget], parent=None):
         super().__init__(parent=parent)
@@ -46,12 +64,13 @@ class ItemMaskWidget(QWidget):
 
     def paintEvent(self, e):
         painter = QPainter(self)
-        painter.setRenderHints(QPainter.Antialiasing |
-                               QPainter.TextAntialiasing)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
         # draw background
         painter.setPen(Qt.NoPen)
-        painter.setBrush(autoFallbackThemeColor(self.lightBackgroundColor, self.darkBackgroundColor))
+        painter.setBrush(
+            autoFallbackThemeColor(self.lightBackgroundColor, self.darkBackgroundColor)
+        )
         painter.drawRoundedRect(self.rect().adjusted(4, 0, -3, 0), 5, 5)
 
         # draw text
@@ -62,7 +81,7 @@ class ItemMaskWidget(QWidget):
             painter.save()
 
             # draw first item's text
-            x = p.itemSize.width()//2 + 4 + self.x()
+            x = p.itemSize.width() // 2 + 4 + self.x()
             item1 = p.itemAt(QPoint(x, self.y() + 6))
             if not item1:
                 painter.restore()
@@ -78,15 +97,15 @@ class ItemMaskWidget(QWidget):
             self._drawText(item2, painter, h)
 
             painter.restore()
-            w += (iw + 8)  # margin: 0 4px;
+            w += iw + 8  # margin: 0 4px;
 
     def _drawText(self, item: QListWidgetItem, painter: QPainter, y: int):
         align = item.textAlignment()
         w, h = item.sizeHint().width(), item.sizeHint().height()
         if align & Qt.AlignLeft:
-            rect = QRectF(15, y, w, h)      # padding-left: 11px
+            rect = QRectF(15, y, w, h)  # padding-left: 11px
         elif align & Qt.AlignRight:
-            rect = QRectF(4, y, w-15, h)    # padding-right: 11px
+            rect = QRectF(4, y, w - 15, h)  # padding-right: 11px
         elif align & Qt.AlignCenter:
             rect = QRectF(4, y, w, h)
 
@@ -94,54 +113,62 @@ class ItemMaskWidget(QWidget):
 
 
 class PickerColumnFormatter(QObject):
-    """ Picker column formatter """
+    """Picker column formatter"""
 
     def __init__(self):
         super().__init__()
 
     def encode(self, value):
-        """ convert original value to formatted value """
+        """convert original value to formatted value"""
         return str(value)
 
     def decode(self, value: str):
-        """ convert formatted value to original value """
+        """convert formatted value to original value"""
         return str(value)
 
 
 class DigitFormatter(PickerColumnFormatter):
-    """ Digit formatter """
+    """Digit formatter"""
 
     def decode(self, value):
         return int(value)
 
 
 class PickerColumnButton(QPushButton):
-    """ Picker column button """
+    """Picker column button"""
 
-    def __init__(self, name: str, items: Iterable, width: int, align=Qt.AlignLeft, formatter=None, parent=None):
+    def __init__(
+        self,
+        name: str,
+        items: Iterable,
+        width: int,
+        align=Qt.AlignLeft,
+        formatter=None,
+        parent=None,
+    ):
         super().__init__(text=name, parent=parent)
         self._name = name
-        self._value = None   # type: str
+        self._value = None  # type: str
 
         self.setItems(items)
         self.setAlignment(align)
         self.setFormatter(formatter)
         self.setFixedSize(width, 30)
-        self.setObjectName('pickerButton')
-        self.setProperty('hasBorder', False)
+        self.setObjectName("pickerButton")
+        self.setProperty("hasBorder", False)
         self.setAttribute(Qt.WA_TransparentForMouseEvents)
 
     def align(self):
         return self._align
 
     def setAlignment(self, align=Qt.AlignCenter):
-        """ set the text alignment """
+        """set the text alignment"""
         if align == Qt.AlignLeft:
-            self.setProperty('align', 'left')
+            self.setProperty("align", "left")
         elif align == Qt.AlignRight:
-            self.setProperty('align', 'right')
+            self.setProperty("align", "right")
         else:
-            self.setProperty('align', 'center')
+            self.setProperty("align", "center")
 
         self._align = align
         self.setStyle(QApplication.style())
@@ -156,10 +183,10 @@ class PickerColumnButton(QPushButton):
         self._value = v
         if v is None:
             self.setText(self.name())
-            self.setProperty('hasValue', False)
+            self.setProperty("hasValue", False)
         else:
             self.setText(self.value())
-            self.setProperty('hasValue', True)
+            self.setProperty("hasValue", True)
 
         self.setStyle(QApplication.style())
 
@@ -186,7 +213,7 @@ class PickerColumnButton(QPushButton):
 
 
 def checkColumnIndex(func):
-    """ check whether the index is out of range """
+    """check whether the index is out of range"""
 
     def wrapper(picker, index: int, *args, **kwargs):
         if not 0 <= index < len(picker.columns):
@@ -198,11 +225,11 @@ def checkColumnIndex(func):
 
 
 class PickerBase(QPushButton):
-    """ Picker base class """
+    """Picker base class"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.columns = []   # type: List[PickerColumnButton]
+        self.columns = []  # type: List[PickerColumnButton]
 
         self.lightSelectedBackgroundColor = QColor()
         self.darkSelectedBackgroundColor = QColor()
@@ -220,13 +247,19 @@ class PickerBase(QPushButton):
         self.clicked.connect(self._showPanel)
 
     def setSelectedBackgroundColor(self, light, dark):
-        """ set the background color of selected row """
+        """set the background color of selected row"""
         self.lightSelectedBackgroundColor = QColor(light)
         self.darkSelectedBackgroundColor = QColor(dark)
 
-    def addColumn(self, name: str, items: Iterable, width: int, align=Qt.AlignCenter,
-                  formatter: PickerColumnFormatter = None):
-        """ add column
+    def addColumn(
+        self,
+        name: str,
+        items: Iterable,
+        width: int,
+        align=Qt.AlignCenter,
+        formatter: PickerColumnFormatter = None,
+    ):
+        """add column
 
         Parameters
         ----------
@@ -253,29 +286,29 @@ class PickerBase(QPushButton):
 
         # update the style of buttons
         for btn in self.columns[:-1]:
-            btn.setProperty('hasBorder', True)
+            btn.setProperty("hasBorder", True)
             btn.setStyle(QApplication.style())
 
     @checkColumnIndex
     def setColumnAlignment(self, index: int, align=Qt.AlignCenter):
-        """ set the text alignment of specified column """
+        """set the text alignment of specified column"""
         self.columns[index].setAlignment(align)
 
     @checkColumnIndex
     def setColumnWidth(self, index: int, width: int):
-        """ set the width of specified column """
+        """set the width of specified column"""
         self.columns[index].setFixedWidth(width)
 
     @checkColumnIndex
     def setColumnTight(self, index: int):
-        """ make the specified column to be tight """
+        """make the specified column to be tight"""
         fm = self.fontMetrics()
         w = max(fm.width(i) for i in self.columns[index].items) + 30
         self.setColumnWidth(index, w)
 
     @checkColumnIndex
     def setColumnVisible(self, index: int, isVisible: bool):
-        """ set the text alignment of specified column """
+        """set the text alignment of specified column"""
         self.columns[index].setVisible(isVisible)
 
     def value(self):
@@ -302,17 +335,19 @@ class PickerBase(QPushButton):
 
     @checkColumnIndex
     def encodeValue(self, index: int, value):
-        """ convert original value to formatted value """
+        """convert original value to formatted value"""
         return self.columns[index].formatter().encode(value)
 
     @checkColumnIndex
     def decodeValue(self, index: int, value):
-        """ convert formatted value to origin value """
+        """convert formatted value to origin value"""
         return self.columns[index].formatter().decode(value)
 
     @checkColumnIndex
-    def setColumn(self, index: int, name: str, items: Iterable, width: int, align=Qt.AlignCenter):
-        """ set column
+    def setColumn(
+        self, index: int, name: str, items: Iterable, width: int, align=Qt.AlignCenter
+    ):
+        """set column
 
         Parameters
         ----------
@@ -337,7 +372,7 @@ class PickerBase(QPushButton):
         button.setAlignment(align)
 
     def clearColumns(self):
-        """ clear columns """
+        """clear columns"""
         while self.columns:
             btn = self.columns.pop()
             self.hBoxLayout.removeWidget(btn)
@@ -347,35 +382,35 @@ class PickerBase(QPushButton):
             btn.deleteLater()
 
     def enterEvent(self, e):
-        self._setButtonProperty('enter', True)
+        self._setButtonProperty("enter", True)
 
     def leaveEvent(self, e):
-        self._setButtonProperty('enter', False)
+        self._setButtonProperty("enter", False)
 
     def mousePressEvent(self, e):
-        self._setButtonProperty('pressed', True)
+        self._setButtonProperty("pressed", True)
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e):
-        self._setButtonProperty('pressed', False)
+        self._setButtonProperty("pressed", False)
         super().mouseReleaseEvent(e)
 
     def _setButtonProperty(self, name, value):
-        """ send event to picker buttons """
+        """send event to picker buttons"""
         for button in self.columns:
             button.setProperty(name, value)
             button.setStyle(QApplication.style())
 
     def panelInitialValue(self):
-        """ initial value of panel """
+        """initial value of panel"""
         return self.value()
 
     def setScrollButtonRepeatEnabled(self, isEnabled: bool):
-        """ set whether to enable scroll button auto repeat """
+        """set whether to enable scroll button auto repeat"""
         self._isScrollButtonRepeatEnabled = isEnabled
 
     def _showPanel(self):
-        """ show panel """
+        """show panel"""
         panel = PickerPanel(self)
         for column in self.columns:
             if column.isVisible():
@@ -385,15 +420,17 @@ class PickerBase(QPushButton):
         panel.setResetEnabled(self.isRestEnabled())
         panel.setScrollButtonRepeatEnabled(self._isScrollButtonRepeatEnabled)
         panel.setSelectedBackgroundColor(
-            self.lightSelectedBackgroundColor, self.darkSelectedBackgroundColor)
+            self.lightSelectedBackgroundColor, self.darkSelectedBackgroundColor
+        )
 
         panel.confirmed.connect(self._onConfirmed)
         panel.resetted.connect(self.reset)
         panel.columnValueChanged.connect(
-            lambda i, v: self._onColumnValueChanged(panel, i, v))
+            lambda i, v: self._onColumnValueChanged(panel, i, v)
+        )
 
         w = panel.vBoxLayout.sizeHint().width() - self.width()
-        panel.exec(self.mapToGlobal(QPoint(-w//2, -37 * 4)))
+        panel.exec(self.mapToGlobal(QPoint(-w // 2, -37 * 4)))
 
     def _onConfirmed(self, value: list):
         for i, v in enumerate(value):
@@ -404,19 +441,19 @@ class PickerBase(QPushButton):
             self.setColumnValue(i, None)
 
     def _onColumnValueChanged(self, panel, index: int, value: str):
-        """ column value changed slot """
+        """column value changed slot"""
         pass
 
     def isRestEnabled(self):
         return self._isResetEnabled
 
     def setResetEnabled(self, isEnabled: bool):
-        """ set the visibility of reset button """
+        """set the visibility of reset button"""
         self._isResetEnabled = isEnabled
 
 
 class PickerToolButton(TransparentToolButton):
-    """ Picker tool button """
+    """Picker tool button"""
 
     def _drawIcon(self, icon, painter, rect):
         if self.isPressed:
@@ -426,7 +463,7 @@ class PickerToolButton(TransparentToolButton):
 
 
 class PickerPanel(QWidget):
-    """ picker panel """
+    """picker panel"""
 
     confirmed = Signal(list)
     resetted = Signal()
@@ -435,7 +472,7 @@ class PickerPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.itemHeight = 37
-        self.listWidgets = []   # type: List[CycleListWidget]
+        self.listWidgets = []  # type: List[CycleListWidget]
 
         self.view = QFrame(self)
         self.itemMaskWidget = ItemMaskWidget(self.listWidgets, self)
@@ -454,8 +491,9 @@ class PickerPanel(QWidget):
         self.__initWidget()
 
     def __initWidget(self):
-        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint |
-                            Qt.NoDropShadowWindowHint)
+        self.setWindowFlags(
+            Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
+        )
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         self.setShadowEffect()
@@ -482,27 +520,23 @@ class PickerPanel(QWidget):
         self.buttonLayout.addWidget(self.yesButton)
         self.buttonLayout.addWidget(self.resetButton)
         self.buttonLayout.addWidget(self.cancelButton)
-        self.yesButton.setSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.resetButton.setSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.cancelButton.setSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.yesButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.resetButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.cancelButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.yesButton.clicked.connect(self._fadeOut)
-        self.yesButton.clicked.connect(
-            lambda: self.confirmed.emit(self.value()))
+        self.yesButton.clicked.connect(lambda: self.confirmed.emit(self.value()))
         self.cancelButton.clicked.connect(self._fadeOut)
         self.resetButton.clicked.connect(self.resetted)
         self.resetButton.clicked.connect(self._fadeOut)
 
         self.setResetEnabled(False)
 
-        self.view.setObjectName('view')
+        self.view.setObjectName("view")
         FluentStyleSheet.TIME_PICKER.apply(self)
 
     def setShadowEffect(self, blurRadius=30, offset=(0, 8), color=QColor(0, 0, 0, 30)):
-        """ add shadow to dialog """
+        """add shadow to dialog"""
         self.shadowEffect = QGraphicsDropShadowEffect(self.view)
         self.shadowEffect.setBlurRadius(blurRadius)
         self.shadowEffect.setOffset(*offset)
@@ -511,11 +545,11 @@ class PickerPanel(QWidget):
         self.view.setGraphicsEffect(self.shadowEffect)
 
     def setResetEnabled(self, isEnabled: bool):
-        """ set the visibility of reset button """
+        """set the visibility of reset button"""
         self.resetButton.setVisible(isEnabled)
 
     def setScrollButtonRepeatEnabled(self, isEnabled: bool):
-        """ set whether to enable scroll button auto repeat """
+        """set whether to enable scroll button auto repeat"""
         self.scrollButtonRepeatEnabled = isEnabled
         for widget in self.listWidgets:
             widget.setScrollButtonRepeatEnabled(isEnabled)
@@ -527,7 +561,7 @@ class PickerPanel(QWidget):
         return self.resetButton.isVisible()
 
     def addColumn(self, items: Iterable, width: int, align=Qt.AlignCenter):
-        """ add one column to view
+        """add one column to view
 
         Parameters
         ----------
@@ -549,22 +583,23 @@ class PickerPanel(QWidget):
 
         N = len(self.listWidgets)
         w.currentItemChanged.connect(
-            lambda i, n=N: self.columnValueChanged.emit(n, i.text()))
+            lambda i, n=N: self.columnValueChanged.emit(n, i.text())
+        )
 
         self.listWidgets.append(w)
         self.listLayout.addWidget(w)
 
     def resizeEvent(self, e):
-        self.itemMaskWidget.resize(self.view.width()-3, self.itemHeight)
+        self.itemMaskWidget.resize(self.view.width() - 3, self.itemHeight)
         m = self.hBoxLayout.contentsMargins()
-        self.itemMaskWidget.move(m.left()+2, m.top() + 148)
+        self.itemMaskWidget.move(m.left() + 2, m.top() + 148)
 
     def value(self):
-        """ return the value of columns """
+        """return the value of columns"""
         return [i.currentItem().text() for i in self.listWidgets]
 
     def setValue(self, value: list):
-        """ set the value of columns """
+        """set the value of columns"""
         if len(value) != len(self.listWidgets):
             return
 
@@ -572,25 +607,25 @@ class PickerPanel(QWidget):
             w.setSelectedItem(v)
 
     def columnValue(self, index: int) -> str:
-        """ return the value of specified column """
+        """return the value of specified column"""
         if not 0 <= index < len(self.listWidgets):
             return
 
         return self.listWidgets[index].currentItem().text()
 
     def setColumnValue(self, index: int, value: str):
-        """ set the value of specified column """
+        """set the value of specified column"""
         if not 0 <= index < len(self.listWidgets):
             return
 
         self.listWidgets[index].setSelectedItem(value)
 
     def column(self, index: int):
-        """ return the list widget of specified column """
+        """return the list widget of specified column"""
         return self.listWidgets[index]
 
     def exec(self, pos, ani=True):
-        """ show panel
+        """show panel
 
         Parameters
         ----------
@@ -609,7 +644,8 @@ class PickerPanel(QWidget):
         rect = getCurrentScreenGeometry()
         w, h = self.width() + 5, self.height()
         pos.setX(
-            min(pos.x() - self.layout().contentsMargins().left(), rect.right() - w))
+            min(pos.x() - self.layout().contentsMargins().left(), rect.right() - w)
+        )
         pos.setY(max(rect.top(), min(pos.y() - 4, rect.bottom() - h + 5)))
         self.move(pos)
 
@@ -617,7 +653,7 @@ class PickerPanel(QWidget):
             return
 
         self.isExpanded = False
-        self.ani = QPropertyAnimation(self.view, b'windowOpacity', self)
+        self.ani = QPropertyAnimation(self.view, b"windowOpacity", self)
         self.ani.valueChanged.connect(self._onAniValueChanged)
         self.ani.setStartValue(0)
         self.ani.setEndValue(1)
@@ -631,14 +667,14 @@ class PickerPanel(QWidget):
         h = self.view.height() + m.top() + m.bottom() + 12
         if not self.isExpanded:
             y = int(h / 2 * (1 - opacity))
-            self.setMask(QRegion(0, y, w, h-y*2))
+            self.setMask(QRegion(0, y, w, h - y * 2))
         else:
             y = int(h / 3 * (1 - opacity))
-            self.setMask(QRegion(0, y, w, h-y*2))
+            self.setMask(QRegion(0, y, w, h - y * 2))
 
     def _fadeOut(self):
         self.isExpanded = True
-        self.ani = QPropertyAnimation(self, b'windowOpacity', self)
+        self.ani = QPropertyAnimation(self, b"windowOpacity", self)
         self.ani.valueChanged.connect(self._onAniValueChanged)
         self.ani.finished.connect(self.deleteLater)
         self.ani.setStartValue(1)
